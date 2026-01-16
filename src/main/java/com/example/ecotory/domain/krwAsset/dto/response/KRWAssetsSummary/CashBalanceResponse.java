@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class AvailableAmountResponse {
-    private double availableAmount;
+public class CashBalanceResponse {
+    private double cashBalance;
     private boolean success;
 }

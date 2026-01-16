@@ -2,8 +2,9 @@ package com.example.ecotory.domain.assetEvaluation.service;
 
 import com.example.ecotory.domain.coinAsset.repository.CoinAssetRepository;
 import com.example.ecotory.domain.krwAsset.dto.response.KRWAssetsSummary.*;
-import com.example.ecotory.domain.krwAsset.entity.KRWAsset;
+import com.example.ecotory.domain.krwAsset.entity.krwAsset;
 import com.example.ecotory.domain.krwAsset.repository.KrwAssetRepository;
+import com.example.ecotory.domain.member.repository.MemberRepository;
 import com.example.ecotory.global.webSocket.price.MarketPriceCache;
 import com.example.ecotory.global.webSocket.provider.response.OrderbookResponseByProvider;
 import lombok.RequiredArgsConstructor;
@@ -17,51 +18,11 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class  AssetEvaluationService {
 
+    private final MemberRepository memberRepository;
     private final KrwAssetRepository krwAssetRepository;
     private final CoinAssetRepository coinAssetRepository;
     private final MarketPriceCache marketPriceCache;
 
-    // 주문 가능 금액(=보유 KRW 잔고, krwAsset.cashBalance) : 사용자가 직접 입력, 추가 금액 기재시 더함? 더할 필요가 있나 그냥 수정을 하면 될듯
-    public AvailableAmountResponse getAvailableAmount(String subject, double amount) {
-
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
-
-        KRWAsset krwAsset = krwAssetRepository.findByMember(subject)
-                .orElseThrow(() -> new NoSuchElementException("KRW 자산 없음"));
-
-        if (amount <= 0) {
-            throw new IllegalArgumentException("금액은 0보다 커야 합니다");
-        } // 어노테이션이 가능했던걸로 기억 ... 찾아봐 ? @Min(1)? positive?
-
-        double updatedBalance = krwAsset.getCashBalance() + amount;
-        krwAsset.setCashBalance(updatedBalance);
-
-        krwAssetRepository.save(krwAsset);
-
-        return AvailableAmountResponse.builder()
-                .availableAmount(updatedBalance)
-                .success(true)
-                .build();
-    }
-
-    // 총 매수금액(코인 총 매수금액 : krwAsset.totalByAmount) = 코인별 매수금액(coinAsset.buyAmount)의 총합
-    public TotalBuyAmountResponse TotalBuyAmount(String subject) {
-
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
-
-        List<KRWAsset> krwAssetList = krwAssetRepository.findByMemberId(subject);
-
-        double totalBuyAmount = krwAssetList.stream()
-                .mapToDouble(a -> a.getAmount() * a.getAvgPrice())
-                .sum();
-
-        return TotalBuyAmountResponse.builder()
-                .success(true)
-                .totalBuyAmount(totalBuyAmount)
-                .build();
-    }
 
     // 총 평가손익 = 코인별 평가손익의 합??? - webshcoket 최신가 기준 (코인별 평가손익 = 수량 × (현재가 - 평균단가))
     public TotalProfitResponse getTotalProfit(String subject) {
@@ -70,10 +31,10 @@ public class  AssetEvaluationService {
                 .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
 
 
-        List<KRWAsset> KRWAssets = KrwAssetRepository.findByMemberId(subject);
+        List<krwAsset> krwAssets = KrwAssetRepository.findByMemberId(subject);
         Map<String, OrderbookResponseByProvider> orderbooks = orderbookService.getAllOrderbooks();
 
-        double totalProfit = KRWAssets.stream()
+        double totalProfit = krwAssets.stream()
                 .mapToDouble(a -> {
                     OrderbookResponseByProvider ob = getLatestOrderbook(a.getTradingPair(), orderbooks);
                     double price = (ob != null && !ob.getOrderbookUnits().isEmpty())
@@ -96,14 +57,14 @@ public class  AssetEvaluationService {
                 .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
 
         // 멤버 존재 여부 확인
-        List<KRWAsset> KRWAssets = KrwAssetRepository.findByMemberId(subject);
+        List<krwAsset> krwAssets = KrwAssetRepository.findByMemberId(subject);
 
         // 최신 오더북 조회
         Map<String, OrderbookResponseByProvider> orderbooks = orderbookServiceByProvider.getAllOrderbooks();
 
 
         // 총 평가금액 계산
-        double totalEvalAmount = KRWAssets.stream()
+        double totalEvalAmount = krwAssets.stream()
                 .mapToDouble(a -> {
                     OrderbookResponseByProvider ob = getLatestOrderbook(a.getTradingPair(), orderbooks);
                     double price = (ob != null && !ob.getOrderbookUnits().isEmpty()) // 최신가 우선

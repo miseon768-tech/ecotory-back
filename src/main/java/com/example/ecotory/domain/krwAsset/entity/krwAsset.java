@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 
-public class KRWAsset {
+public class krwAsset {
 
     @Id
     @GeneratedValue(generator = "UUID")

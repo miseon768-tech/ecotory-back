@@ -1,6 +1,6 @@
 package com.example.ecotory.domain.coinAsset.dto.response.FavoriteCoin;
 
-import com.example.ecotory.domain.krwAsset.entity.KRWAsset;
+import com.example.ecotory.domain.krwAsset.entity.krwAsset;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @Builder
 public class DeleteFavoriteCoinResponse {
-    private KRWAsset KRWAsset;
+    private krwAsset KRWAsset;
     private boolean success;
 }

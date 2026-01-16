@@ -1,6 +1,6 @@
 package com.example.ecotory.domain.krwAsset.dto.response.KRWassets;
 
-import com.example.ecotory.domain.krwAsset.entity.KRWAsset;
+import com.example.ecotory.domain.krwAsset.entity.krwAsset;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +11,6 @@ import java.util.List;
 @Setter
 @Builder
 public class KRWAssetByMemberResponse {
-    private List<KRWAsset> KRWAssetList;
+    private List<krwAsset> krwAssetList;
     private boolean success;
 }

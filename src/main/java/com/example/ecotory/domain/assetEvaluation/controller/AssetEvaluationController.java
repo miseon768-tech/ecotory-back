@@ -1,4 +1,4 @@
-package com.example.ecotory.domain.krwAsset.controller;
+package com.example.ecotory.domain.assetEvaluation.controller;
 
 import com.example.ecotory.domain.krwAsset.dto.response.KRWAssetsSummary.*;
 import com.example.ecotory.domain.krwAsset.service.KRWAssetsService;
@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/KRWAssets/summary")
 @Validated
 
-public class KRWAssetsController {
+public class AssetEvaluationController {
 
     final KRWAssetsService krwAssetsService;
 
@@ -31,7 +30,7 @@ public class KRWAssetsController {
     public ResponseEntity<?> getAvailableAmount(@RequestAttribute String subject,
                                                 @RequestParam @Positive Double amount) {
 
-        AvailableAmountResponse response = krwAssetsService.getAvailableAmount(subject, amount);
+        CashBalanceResponse response = krwAssetsService.getAvailableAmount(subject, amount);
 
         return ResponseEntity.ok(response);
     }
