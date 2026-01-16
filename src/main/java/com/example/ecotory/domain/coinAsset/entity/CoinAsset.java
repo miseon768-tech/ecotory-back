@@ -1,0 +1,44 @@
+package com.example.ecotory.domain.coinAsset.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
+
+import java.time.LocalDateTime;
+
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity
+
+public class CoinAsset {
+
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    private String id;
+
+    private String krwAssetId;
+    private String tradingPairId;
+
+    private double coinBalance;
+    private double avgBuyPrice;
+    private double buyAmount;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+}
