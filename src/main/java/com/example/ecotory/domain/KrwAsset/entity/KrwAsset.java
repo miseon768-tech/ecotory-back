@@ -1,4 +1,4 @@
-package com.example.ecotory.domain.coinAsset.entity;
+package com.example.ecotory.domain.KrwAsset.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,19 +13,18 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 
-public class CoinAsset {
+public class KrwAsset {
 
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
-    private String krwAssetId;
-    private String tradingPairId;
+    private String memberId;
 
-    private double coinBalance;
-    private long avgBuyPrice;
-    private long buyAmount;
+
+    private long cashBalance;
+    private long totalByAmount;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

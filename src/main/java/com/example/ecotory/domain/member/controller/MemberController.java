@@ -25,9 +25,7 @@ public class MemberController {
     @GetMapping
     public ResponseEntity<MemberResponse> findById(@RequestAttribute String subject) {
 
-
         MemberResponse response = memberService.findById(subject);
-
 
         return ResponseEntity
                 .status(HttpStatus.CREATED) //201
@@ -38,7 +36,29 @@ public class MemberController {
     @Operation(summary = "계정 정보 수정", description = "로그인한 사용자의 계정 정보를 수정합니다.")
     @PostMapping
     public ResponseEntity<?> update(@RequestAttribute String subject) {
-        return null;
+        MemberResponse response = memberService.update(subject);
+        return ResponseEntity
+                .status(HttpStatus.CREATED) //201
+                .body(response);
     }
 
+    // 비밀번호 변경
+    @Operation(summary = "계정 정보 수정", description = "로그인한 사용자의 계정 정보를 수정합니다.")
+    @PostMapping
+    public ResponseEntity<?> update(@RequestAttribute String subject) {
+        MemberResponse response = memberService.update(subject);
+        return ResponseEntity
+                .status(HttpStatus.CREATED) //201
+                .body(response);
+    }
+
+    // 회원 탈퇴
+    @Operation(summary = "계정 정보 수정", description = "로그인한 사용자의 계정 정보를 수정합니다.")
+    @PostMapping
+    public ResponseEntity<?> update(@RequestAttribute String subject) {
+        MemberResponse response = memberService.update(subject);
+        return ResponseEntity
+                .status(HttpStatus.CREATED) //201
+                .body(response);
+    }
 }

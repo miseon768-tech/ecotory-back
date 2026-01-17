@@ -1,5 +1,6 @@
 package com.example.ecotory.domain.coinAsset.controller;
 
+import com.example.ecotory.domain.coinAsset.dto.response.CoinAsset.CoinBuyAmountUpsertResponse;
 import com.example.ecotory.domain.coinAsset.dto.response.CoinAsset.*;
 import com.example.ecotory.domain.coinAsset.service.CoinAssetService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -80,6 +81,38 @@ public class CoinAssetController {
 
     }
 
+    @Operation(summary = "코인별 매수금액 입력 및 수정", description = "사용자의 코인별 매수금액을 입력 및 수정합니다.")
+    @PostMapping("/purchase-by-coin")
+    public ResponseEntity<CoinBuyAmountUpsertResponse> coinBuyAmountUpsert(@RequestAttribute String subject,
+                                                                           @RequestBody Long amount) {
+
+        CoinBuyAmountUpsertResponse response = coinAssetService.coinBuyAmountUpsert(subject, amount);
+
+        return ResponseEntity.status(HttpStatus.OK) //200
+                .body(response);
+    }
+
+
+    @Operation(summary = "코인별 매수금액 조회", description = "사용자의 코인별 매수금액을 조회합니다.")
+    @GetMapping("/purchase-by-coin")
+    public ResponseEntity<CoinBuyAmountGetResponse> purchaseByCoinGet(@RequestAttribute String subject) {
+
+        CoinBuyAmountGetResponse response = coinAssetService.coinBuyAmountGet(subject);
+
+        return ResponseEntity.status(HttpStatus.OK) //200
+                .body(response);
+    }
+
+
+    @Operation(summary = "총 매수금액 조회", description = "사용자의 총 매수금액을 조회합니다.")
+    @GetMapping("/total-purchase-amount")
+    public ResponseEntity<TotalCoinBuyAmountResponse> totalCoinBuyAmount(@RequestAttribute String subject) {
+
+        TotalCoinBuyAmountResponse response = coinAssetService.totalCoinBuyAmount(subject);
+
+        return ResponseEntity.status(HttpStatus.OK) //200
+                .body(response);
+    }
 
 }
 

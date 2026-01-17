@@ -1,5 +1,8 @@
 package com.example.ecotory.domain.coinAsset.service;
 
+import com.example.ecotory.domain.coinAsset.dto.response.CoinAsset.CoinBuyAmountUpsertResponse;
+import com.example.ecotory.domain.KrwAsset.dto.response.KrwAssetSummary.TotalBuyAmountResponse;
+import com.example.ecotory.domain.KrwAsset.entity.KrwAsset;
 import com.example.ecotory.domain.coinAsset.dto.response.CoinAsset.*;
 import com.example.ecotory.domain.coinAsset.entity.CoinAsset;
 import com.example.ecotory.domain.coinAsset.repository.CoinAssetRepository;
@@ -115,6 +118,61 @@ public class CoinAssetService {
         return CoinAssetByCategoryResponse.builder()
                 .coinAssetList(CoinAssetList)
                 .success(true)
+                .build();
+    }
+    // 코인별 매수 금액 입력 및 수정
+    public CoinBuyAmountUpsertResponse coinBuyAmountUpsert(String subject, long amount) {
+
+        memberRepository.findById(subject)
+                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+
+        CoinAsset coinAsset = coinAssetRepository.findByMemberId(subject)
+                .orElseThrow(() -> new NoSuchElementException("코인 자산 없음"));
+
+        if (amount <= 0) {
+            throw new IllegalArgumentException("금액은 0보다 커야 합니다");
+        } // 어노테이션이 가능했던걸로 기억 ... 찾아봐 ? @Min(1)? positive?
+
+
+        coinAsset.setBuyAmount(amount);
+        coinAssetRepository.save(coinAsset);
+
+        return CoinBuyAmountUpsertResponse.builder()
+                .buyAmount(coinAsset.getBuyAmount())
+                .success(true)
+                .build();
+    }
+
+    // 코인별 매수 금액 조회
+    public CoinBuyAmountGetResponse coinBuyAmountGet(String subject) {
+
+        memberRepository.findById(subject)
+                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+
+        CoinAsset coinAsset = coinAssetRepository.findByMemberId(subject)
+                .orElseThrow(() -> new IllegalStateException("값이 없으면 안되는 상태"));
+
+
+        return CoinBuyAmountGetResponse.builder()
+                .success(true)
+                .build();
+    }
+
+    // 총 매수금액 = 코인별 매수금액의 총합
+    public TotalCoinBuyAmountResponse totalCoinBuyAmount(String subject) {
+
+        memberRepository.findById(subject)
+                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+
+        List<CoinAsset> coinAssets = coinAssetRepository.findAllByMemberId(subject);
+
+        long totalBuyAmount = coinAssets.stream()
+                .mapToLong(CoinAsset::getBuyAmount)
+                .sum();
+
+        return TotalCoinBuyAmountResponse.builder()
+                .success(true)
+                .totalBuyAmount(totalBuyAmount)
                 .build();
     }
 }

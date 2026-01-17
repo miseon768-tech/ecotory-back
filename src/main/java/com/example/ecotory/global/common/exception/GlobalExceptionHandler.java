@@ -39,6 +39,10 @@ public class GlobalExceptionHandler {
     /*
         if (!post.getMemberId().equals(subject)) {
         throw new IllegalStateException("글 수정 권한 없음"); //403
+
+        default 0 -> 시뮬레이션 안 함
+        .orElseThrow(() -> new IllegalStateException("값이 없으면 안되는 상태"));
+
     }*/
 
     // 400 - 잘못된 요청 값(수량 음수, 잘못된 파라미터)

@@ -22,7 +22,7 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
 
         return uri.startsWith("/api/member")
                 || uri.startsWith("/api/tradingPair")
-                || uri.startsWith("/api/krwAsset")
+                || uri.startsWith("/api/KrwAsset")
                 || method.equals("OPTIONS");
     }
 

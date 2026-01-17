@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CoinAssetRepository extends JpaRepository<CoinAsset, String> {
@@ -15,4 +16,8 @@ public interface CoinAssetRepository extends JpaRepository<CoinAsset, String> {
     List<CoinAsset> findByMemberIdAndTradingPairKoreanName(String subject, String koreanName);
 
     List<CoinAsset> findByMemberIdAndTradingPairEnglishName(String subject, String englishName);
+
+    Optional<CoinAsset> findByMemberId(String subject);
+
+    List<CoinAsset> findAllByMemberId(String subject);
 }

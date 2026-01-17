@@ -1,4 +1,4 @@
-package com.example.ecotory.domain.comment.dto.response.comment;
+package com.example.ecotory.domain.KrwAsset.dto.response.KrwAsset;
 
 import com.example.ecotory.domain.KrwAsset.entity.KrwAsset;
 import lombok.Builder;
@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class DeleteCommentResponse {
-    private KrwAsset KRWAsset;
+public class KrwAssetCreateResponse {
+    private KrwAsset KrwAsset;
     private boolean success;
 }
