@@ -1,7 +1,9 @@
 package com.example.ecotory.domain.assetPriceStream.controller;
 
 import com.example.ecotory.domain.KrwAsset.dto.response.KrwAssetSummary.*;
+import com.example.ecotory.domain.assetPriceStream.response.CoinProfitResponse;
 import com.example.ecotory.domain.assetPriceStream.service.AssetPriceStreamService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @SecurityRequirement(name = "bearerAuth")
-@Tag(name = "자산 요약 API", description = "자산 요약 조회 API")
+@Tag(name = "Asset Price Stream", description = "자산 평가금액 스트림 관련 API")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
@@ -22,56 +24,80 @@ public class AssetPriceStreamController {
 
     private final AssetPriceStreamService assetPriceStreamService;
 
-    // 코인별 평가손익 조회
+    @Operation(summary = "코인별 평가손익 조회", description = "특정 코인의 평가손익을 조회합니다.")
     @GetMapping("/profit")
-    public ResponseEntity<?> getTotalProfit() {
+    public ResponseEntity<CoinProfitResponse> coinProfit(@RequestAttribute String subject,
+                                                         @RequestParam String market) {
 
-        TotalProfitResponse response = assetPriceStreamService.getTotalProfit();
+        double coinProfit = assetPriceStreamService.coinProfit(subject, market);
+
+        CoinProfitResponse response = CoinProfitResponse.builder()
+                .success(true)
+                .profit(coinProfit)
+                .build();
 
         return ResponseEntity.ok(response);
 
     }
 
-    // 총 평가손익 조회
+    @Operation(summary = "총 평가손익 조회", description = "총 평가손익을 조회합니다.")
     @GetMapping("/profit")
-    public ResponseEntity<?> getTotalProfit() {
+    public ResponseEntity<TotalProfitResponse> getTotalProfit(@RequestAttribute String subject) {
 
-        TotalProfitResponse response = assetPriceStreamService.getTotalProfit();
+        double getTotalProfit = assetPriceStreamService.getTotalProfit(subject);
+
+        TotalProfitResponse response = TotalProfitResponse.builder()
+                .success(true)
+                .totalProfit(getTotalProfit)
+                .build();
 
         return ResponseEntity.ok(response);
 
     }
 
-    // 총 평가금액(KRW) 조회
+    @Operation(summary = "총 평가 금액 조회", description = "총 평가 금액을 조회합니다.")
     @GetMapping("/eval")
-    public ResponseEntity<?> getTotalEvalAmount(@RequestAttribute String subject) {
+    public ResponseEntity<TotalEvalAmountResponse> getTotalEvalAmount(@RequestAttribute String subject) {
 
-        TotalEvalAmountResponse response = assetPriceStreamService.getTotalEvalAmount();
+        double getTotalEvalAmount = assetPriceStreamService.getTotalEvalAmount(subject);
 
-                return ResponseEntity.ok(response);
+        TotalEvalAmountResponse response = TotalEvalAmountResponse.builder()
+                .success(true)
+                .totalEvalAmount(getTotalEvalAmount)
+                .build();
+
+        return ResponseEntity.ok(response);
 
     }
 
-    // 총 보유자산 조회
+    @Operation(summary = "총 자산 조회", description = "총 자산을 조회합니다.")
     @GetMapping("/total")
-    public ResponseEntity<?> getTotalAssets(@RequestAttribute String subject) {
+    public ResponseEntity<TotalAssetsResponse> getTotalAssets(@RequestAttribute String subject) {
 
-        TotalAssetsResponse response = assetPriceStreamService.getTotalAssets();
+        double getTotalAssets = assetPriceStreamService.getTotalAssets(subject);
 
-                return ResponseEntity.ok(response);
+        TotalAssetsResponse response = TotalAssetsResponse.builder()
+                .success(true)
+                .totalAssets(getTotalAssets)
+                .build();
+
+        return ResponseEntity.ok(response);
 
     }
 
-    // 총 수익률 조회
+    @Operation(summary = "총 수익률 조회", description = "총 수익률을 조회합니다.")
     @GetMapping("/profit-rate")
-    public ResponseEntity<?> getTotalProfitRate() {
+    public ResponseEntity<TotalProfitRateResponse> getTotalProfitRate(@RequestAttribute String subject) {
 
-        TotalProfitRateResponse response = assetPriceStreamService.getTotalProfitRate();
+        double getTotalProfitRate = assetPriceStreamService.getTotalProfitRate(subject);
 
-                return ResponseEntity.ok(response);
+        TotalProfitRateResponse response = TotalProfitRateResponse.builder()
+                .success(true)
+                .totalProfitRate(getTotalProfitRate)
+                .build();
 
+        return ResponseEntity.ok(response);
     }
-
 }
 
 

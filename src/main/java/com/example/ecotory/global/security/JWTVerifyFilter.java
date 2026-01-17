@@ -1,8 +1,9 @@
-package com.example.ecotory.global.security.jwt;
+package com.example.ecotory.global.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.example.ecotory.domain.member.repository.MemberRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,10 +12,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-// @Component 제거! SecurityConfig에서 Bean으로 등록할 예정
 public class JWTVerifyFilter extends OncePerRequestFilter {
 
-    // 인증이 필요 없는 요청 필터링
+    private final MemberRepository memberRepository;
+
+    public JWTVerifyFilter(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
@@ -22,15 +27,15 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
 
         return uri.startsWith("/api/member")
                 || uri.startsWith("/api/tradingPair")
-                || uri.startsWith("/api/KrwAsset")
+                || uri.startsWith("/api/krwAsset")
                 || method.equals("OPTIONS");
     }
 
-    // 인증이 필요한 요청에 대해 JWT 검증 수행
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
         String authorization = request.getHeader("Authorization");
 
@@ -39,14 +44,22 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authorization.substring(7);
-
         try {
+            String token = authorization.substring(7);
+
             DecodedJWT jwt = JWT.require(
-                    Algorithm.HMAC256("092860be0db7b8fe")
-            ).withIssuer("ecotory").build().verify(token);
+                            Algorithm.HMAC256("092860be0db7b8fe")
+                    ).withIssuer("ecotory")
+                    .build()
+                    .verify(token);
 
             String subject = jwt.getSubject();
+
+            // ✅ 여기서 로그인 사용자 보장 (실무 핵심)
+            memberRepository.findById(subject)
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자"));
+
+            // 컨트롤러 / 서비스에서 사용
             request.setAttribute("subject", subject);
 
             filterChain.doFilter(request, response);

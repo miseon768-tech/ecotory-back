@@ -86,7 +86,11 @@ public class CoinAssetController {
     public ResponseEntity<CoinBuyAmountUpsertResponse> coinBuyAmountUpsert(@RequestAttribute String subject,
                                                                            @RequestBody Long amount) {
 
-        CoinBuyAmountUpsertResponse response = coinAssetService.coinBuyAmountUpsert(subject, amount);
+        long coinBuyAmountUpsert = coinAssetService.coinBuyAmountUpsert(subject, amount);
+        CoinBuyAmountUpsertResponse response = CoinBuyAmountUpsertResponse.builder()
+                .success(true)
+                .coinBuyAmountUpsert(coinBuyAmountUpsert)
+                .build();
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -95,9 +99,14 @@ public class CoinAssetController {
 
     @Operation(summary = "코인별 매수금액 조회", description = "사용자의 코인별 매수금액을 조회합니다.")
     @GetMapping("/purchase-by-coin")
-    public ResponseEntity<CoinBuyAmountGetResponse> purchaseByCoinGet(@RequestAttribute String subject) {
+    public ResponseEntity<CoinBuyAmountGetResponse> coinBuyAmountGet(@RequestAttribute String subject) {
 
-        CoinBuyAmountGetResponse response = coinAssetService.coinBuyAmountGet(subject);
+        long coinBuyAmountGet = coinAssetService.coinBuyAmountGet(subject);
+
+        CoinBuyAmountGetResponse response = CoinBuyAmountGetResponse.builder()
+                .success(true)
+                .coinBuyAmountGet(coinBuyAmountGet)
+                .build();
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -108,10 +117,14 @@ public class CoinAssetController {
     @GetMapping("/total-purchase-amount")
     public ResponseEntity<TotalCoinBuyAmountResponse> totalCoinBuyAmount(@RequestAttribute String subject) {
 
-        TotalCoinBuyAmountResponse response = coinAssetService.totalCoinBuyAmount(subject);
+        long totalBuyAmount = coinAssetService.totalCoinBuyAmount(subject);
 
-        return ResponseEntity.status(HttpStatus.OK) //200
-                .body(response);
+        TotalCoinBuyAmountResponse response = TotalCoinBuyAmountResponse.builder()
+                .success(true)
+                .totalBuyAmount(totalBuyAmount)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
 }

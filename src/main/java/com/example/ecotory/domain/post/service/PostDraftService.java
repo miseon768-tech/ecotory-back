@@ -24,8 +24,7 @@ public class PostDraftService {
     // 임시글 저장
     public SaveDraftResponse saveDraft(String subject, String title, String content) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         PostDraft postDraft = PostDraft.builder()
                 .title(title)
@@ -44,8 +43,7 @@ public class PostDraftService {
 
     // 작성자 기준 임시글 불러오기
     public GetDraftResponse getDraft(String subject) {
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         List<PostDraft> draftList = postDraftRepository
                 .findByMemberOrderByUpdatedAtDesc(subject);

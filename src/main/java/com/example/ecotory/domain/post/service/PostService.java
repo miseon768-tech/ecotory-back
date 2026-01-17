@@ -33,8 +33,7 @@ public class PostService {
     // 글 작성
     public AddPostResponse createPost(String subject, AddPostRequest addPostRequest) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         Post post = new Post();
         post.setTitle(addPostRequest.getTitle());
@@ -48,8 +47,7 @@ public class PostService {
     // 글 수정
     public UpdatePostResponse updatePost(String postId, String subject, UpdatePostRequest updatePostRequest) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
@@ -70,8 +68,7 @@ public class PostService {
     // 글 삭제
     public DeletePostResponse deletePost(String postId, String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
@@ -88,8 +85,7 @@ public class PostService {
     // 글 전체 목록 조회
     public GetAllPostResponse getAllPosts(String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         List<Post> postList = postRepository.findAll();
 
@@ -103,8 +99,7 @@ public class PostService {
     // 단일 글 조회
     public GetPostResponse getPost(String postId, String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
@@ -118,8 +113,7 @@ public class PostService {
     // 내가 쓴 글 조회
     public GetMyPostResponse getMyPostByMember(String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         List<Post> mypostList = postRepository.findByMember(subject);
 
@@ -133,8 +127,7 @@ public class PostService {
     // 키워드로 제목/내용 글 검색
     public GetPostByKeywordResponse searchPosts(String subject, String keyword) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         List<Post> postList = postRepository.findByTitleContainingOrContentContaining(keyword, keyword);
 
@@ -151,8 +144,7 @@ public class PostService {
     // 파일 올리기
     public UploadFilesResponse uploadFiles(String postId, String subject, List<MultipartFile> files) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));

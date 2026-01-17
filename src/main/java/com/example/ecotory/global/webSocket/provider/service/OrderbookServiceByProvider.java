@@ -2,6 +2,7 @@ package com.example.ecotory.global.webSocket.provider.service;
 
 import com.example.ecotory.domain.tradingPair.entity.TradingPair;
 import com.example.ecotory.domain.tradingPair.service.TradingPairService;
+import com.example.ecotory.global.webSocket.provider.mapper.OrderbookMapper;
 import com.example.ecotory.global.webSocket.provider.response.OrderbookResponseByProvider;
 import com.example.ecotory.global.webSocket.push.OrderbookPushService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -48,6 +49,7 @@ public class OrderbookServiceByProvider {
             log.error("KRW 마켓 리스트 조회 실패", e);
         }
     }
+
     private void connectWebSocket() {
         try {
             wsClient = new WebSocketClient(new URI("wss://api.upbit.com/websocket/v1")) {
@@ -65,20 +67,8 @@ public class OrderbookServiceByProvider {
                     try {
                         JsonNode json = objectMapper.readTree(message);
 
-                        List<OrderbookResponseByProvider.OrderbookUnit> units = objectMapper
-                                .readerForListOf(OrderbookResponseByProvider.OrderbookUnit.class)
-                                .readValue(json.get("orderbook_units"));
+                        OrderbookResponseByProvider orderbook = OrderbookMapper.map(json, objectMapper);
 
-                        OrderbookResponseByProvider orderbook = OrderbookResponseByProvider.builder()
-                                .type(json.get("type").asText())
-                                .code(json.get("code").asText())
-                                .totalAskSize(json.get("total_ask_size").asDouble())
-                                .totalBidSize(json.get("total_bid_size").asDouble())
-                                .orderbookUnits(units)
-                                .timestamp(json.get("timestamp").asLong())
-                                .level(json.get("level").asInt())
-                                .streamType(json.get("stream_type").asText())
-                                .build();
 
                         // 마켓+타임스탬프 키로 캐시에 저장
                         String key = orderbook.getCode() + "-" + orderbook.getTimestamp();

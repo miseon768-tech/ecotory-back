@@ -29,8 +29,7 @@ public class FavoriteCoinService {
     // 관심 코인 등록
     public AddFavoriteCoinResponse addFavoriteCoin(String subject, String coinInput) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         TradingPair tradingPair = tradingPairRepository
                 .findByMarketOrKoreanNameOrEnglishName(coinInput, coinInput, coinInput)
@@ -51,8 +50,7 @@ public class FavoriteCoinService {
     // 관심 코인 목록 전체 조회
     public GetFavoriteCoinsResponse getFavoriteCoins(String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         List<FavoriteCoin> favoriteCoinList = favoriteCoinRepository.findFavoriteCoinByMemberId(subject);
 
@@ -70,8 +68,7 @@ public class FavoriteCoinService {
     // 관심 코인 선택 삭제
     public DeleteFavoriteCoinResponse deleteFavoriteCoin(String subject, List<Long> tradingPairIds) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         List<FavoriteCoin> favoriteCoinList = favoriteCoinRepository
                 .findByMemberIdAndTradingPairIdIn(subject, tradingPairIds);
@@ -91,8 +88,7 @@ public class FavoriteCoinService {
     // 관심 코인 전체 삭제
     public DeleteAllFavoriteCoinResponse deleteAllFavoriteCoins(String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         List<FavoriteCoin> favoriteCoinList = favoriteCoinRepository
                 .findFavoriteCoinByMemberId(subject);

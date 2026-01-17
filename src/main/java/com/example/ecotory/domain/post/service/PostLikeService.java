@@ -29,8 +29,7 @@ public class PostLikeService {
     // 좋아요 누르기
     public LikePostResponse likePost(String postId, String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
@@ -57,8 +56,7 @@ public class PostLikeService {
     // 좋아요 취소
     public UnLikePostResponse unlikePost(String postId, String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
@@ -77,8 +75,7 @@ public class PostLikeService {
     // 내가 좋아요한 글 조회
     public GetMyLikedPostsResponse getMyLikedPosts(String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         List<PostLike> likedPosts = postLikeRepository.findByMember(subject);
 

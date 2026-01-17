@@ -2,6 +2,9 @@ package com.example.ecotory.global.webSocket.provider.service;
 
 import com.example.ecotory.domain.tradingPair.entity.TradingPair;
 import com.example.ecotory.domain.tradingPair.service.TradingPairService;
+import com.example.ecotory.global.webSocket.provider.mapper.CandleMapper;
+import com.example.ecotory.global.webSocket.provider.mapper.TradeMapper;
+import com.example.ecotory.global.webSocket.provider.response.CandleResponseByProvider;
 import com.example.ecotory.global.webSocket.provider.response.TradeResponseByProvider;
 import com.example.ecotory.global.webSocket.push.TradePushService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.mapper.Mapper;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.springframework.stereotype.Service;
@@ -64,26 +68,8 @@ public class TradeServiceByProvider {
                     try {
                         JsonNode json = objectMapper.readTree(message);
 
-                        TradeResponseByProvider trade = TradeResponseByProvider.builder()
-                                .type(json.get("type").asText())
-                                .market(json.get("code").asText())
-                                .tradePrice(json.get("trade_price").asDouble())
-                                .tradeVolume(json.get("trade_volume").asDouble())
-                                .askBid(json.get("ask_bid").asText())
-                                .prevClosingPrice(json.get("prev_closing_price").asDouble())
-                                .change(json.get("change").asText())
-                                .changePrice(json.get("change_price").asDouble())
-                                .tradeDate(json.get("trade_date").asText())
-                                .tradeTime(json.get("trade_time").asText())
-                                .tradeTimestamp(json.get("trade_timestamp").asLong())
-                                .timestamp(json.get("timestamp").asLong())
-                                .sequentialId(json.get("sequential_id").asLong())
-                                .bestAskPrice(json.get("best_ask_price").asDouble())
-                                .bestAskSize(json.get("best_ask_size").asDouble())
-                                .bestBidPrice(json.get("best_bid_price").asDouble())
-                                .bestBidSize(json.get("best_bid_size").asDouble())
-                                .streamType(json.get("stream_type").asText())
-                                .build();
+                        TradeResponseByProvider trade = TradeMapper.map(json);
+
 
                         // key: tradingPair + sequentialId
                         String key = trade.getMarket() + "-" + trade.getSequentialId();

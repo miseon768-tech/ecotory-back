@@ -3,10 +3,8 @@ package com.example.ecotory.domain.KrwAsset.service;
 import com.example.ecotory.domain.KrwAsset.dto.request.AddAssetRequest;
 import com.example.ecotory.domain.KrwAsset.dto.request.UpdateAssetRequest;
 import com.example.ecotory.domain.KrwAsset.dto.response.KrwAsset.*;
-import com.example.ecotory.domain.KrwAsset.dto.response.KrwAssetSummary.TotalBuyAmountResponse;
 import com.example.ecotory.domain.KrwAsset.entity.KrwAsset;
 import com.example.ecotory.domain.KrwAsset.repository.KrwAssetRepository;
-import com.example.ecotory.domain.coinAsset.entity.CoinAsset;
 import com.example.ecotory.domain.coinAsset.repository.CoinAssetRepository;
 import com.example.ecotory.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +23,7 @@ public class KrwAssetService {
     // 자산 추가
     public KrwAssetCreateResponse addAsset(String subject, AddAssetRequest addAssetRequest) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         KrwAsset krwAsset = new KrwAsset();
         krwAsset.setCashBalance(addAssetRequest.getCashBalance());
@@ -43,8 +40,7 @@ public class KrwAssetService {
     // 자산 수정
     public AssetUpdateResponse updateAsset(String KrwAssetId, String subject, UpdateAssetRequest updateAssetRequest) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         KrwAsset KrwAsset = krwAssetRepository.findById(KrwAssetId)
                 .orElseThrow(() -> new NoSuchElementException("자산 없음"));
@@ -69,8 +65,7 @@ public class KrwAssetService {
     // 자산 삭제
     public AssetDeleteResponse deleteAsset(String KRWAssetId, String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
         KrwAsset KRWAsset = krwAssetRepository.findById(KRWAssetId)
                 .orElseThrow(() -> new NoSuchElementException("자산 없음"));
@@ -89,8 +84,7 @@ public class KrwAssetService {
     // 특정 멤버 자산 조회
     public KrwAssetByMemberResponse KRWAssetByMember(String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+       
 
 
         List<KrwAsset> krwAssetList = krwAssetRepository.findByMemberId(subject);
@@ -103,10 +97,7 @@ public class KrwAssetService {
     }
 
     // 주문 가능 금액(=보유 KRW) 입력 및 수정 : 사용자가 직접 입력, 추가 금액 기재시 더함? 더할 필요가 있나 그냥 수정을 하면 될듯
-    public CashBalanceUpsertResponse upsertCashBalance(String subject, long amount) {
-
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+    public long upsertCashBalance(String subject, long amount) {
 
         KrwAsset krwAsset = krwAssetRepository.findByMember(subject)
                 .orElseThrow(() -> new NoSuchElementException("KRW 자산 없음"));
@@ -120,25 +111,16 @@ public class KrwAssetService {
         krwAssetRepository.save(krwAsset);
 
 
-        return CashBalanceUpsertResponse.builder()
-                .cashBalance(krwAsset.getCashBalance())
-                .success(true)
-                .build();
+        return krwAsset.getCashBalance();
     }
 
     // 주문 가능 금액 조회
-    public CashBalanceGetResponse getCashBalance(String subject){
-
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+    public long getCashBalance(String subject){
 
         KrwAsset krwAsset = krwAssetRepository.findByMember(subject)
                 .orElseThrow(() -> new IllegalStateException("값이 없으면 안되는 상태"));
 
-        return CashBalanceGetResponse.builder()
-                .cashBalance(krwAsset.getCashBalance())
-                .success(true)
-                .build();
+        return krwAsset.getCashBalance();
     }
 
 }

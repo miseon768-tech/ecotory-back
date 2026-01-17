@@ -1,5 +1,6 @@
 package com.example.ecotory.domain.coinAsset.entity;
 
+import com.example.ecotory.domain.tradingPair.entity.TradingPair;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -21,7 +22,10 @@ public class CoinAsset {
     private String id;
 
     private String krwAssetId;
-    private String tradingPairId;
+
+    @ManyToOne
+    @JoinColumn(name = "trading_pair_id")
+    private TradingPair tradingPair;
 
     private double coinBalance;
     private long avgBuyPrice;

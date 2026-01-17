@@ -72,8 +72,12 @@ public class KrwAssetController {
     @PostMapping("/available-order-amount")
     public ResponseEntity<CashBalanceUpsertResponse> upsertCashBalance(@RequestAttribute String subject,
                                                                        @RequestBody Long amount) {
+        long upsertCashBalance = krwAssetService.upsertCashBalance(subject, amount);
 
-        CashBalanceUpsertResponse response = krwAssetService.upsertCashBalance(subject, amount);
+        CashBalanceUpsertResponse response = CashBalanceUpsertResponse.builder()
+                .cashBalance(upsertCashBalance)
+                .success(true)
+                .build();
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -84,7 +88,11 @@ public class KrwAssetController {
     @GetMapping("/available-order-amount")
     public ResponseEntity<CashBalanceGetResponse> getCashBalance(@RequestAttribute String subject) {
 
-        CashBalanceGetResponse response = krwAssetService.getCashBalance(subject);
+        long getCashBalance = krwAssetService.getCashBalance(subject);
+        CashBalanceGetResponse response = CashBalanceGetResponse.builder()
+                .cashBalance(getCashBalance)
+                .success(true)
+                .build();
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);

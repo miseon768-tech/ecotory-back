@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @Builder
 public class CoinBuyAmountGetResponse {
-    private long buyAmount;
+    private long coinBuyAmountGet;
     private boolean success;
 }

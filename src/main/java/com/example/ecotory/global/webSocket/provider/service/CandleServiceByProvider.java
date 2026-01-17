@@ -2,6 +2,7 @@ package com.example.ecotory.global.webSocket.provider.service;
 
 import com.example.ecotory.domain.tradingPair.entity.TradingPair;
 import com.example.ecotory.domain.tradingPair.service.TradingPairService;
+import com.example.ecotory.global.webSocket.provider.mapper.CandleMapper;
 import com.example.ecotory.global.webSocket.provider.response.CandleResponseByProvider;
 import com.example.ecotory.global.webSocket.push.CandlePushService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -66,20 +66,7 @@ public class CandleServiceByProvider {
                     try {
                         JsonNode json = objectMapper.readTree(message);
 
-                        CandleResponseByProvider candle = CandleResponseByProvider.builder()
-                                .type(json.get("type").asText())
-                                .market(json.get("code").asText())
-                                .candleDateTimeUtc(json.get("candle_date_time_utc").asText())
-                                .candleDateTimeKst(json.get("candle_date_time_kst").asText())
-                                .openingPrice(json.get("opening_price").asDouble())
-                                .highPrice(json.get("high_price").asDouble())
-                                .lowPrice(json.get("low_price").asDouble())
-                                .tradePrice(json.get("trade_price").asDouble())
-                                .candleAccTradeVolume(json.get("candle_acc_trade_volume").asDouble())
-                                .candleAccTradePrice(json.get("candle_acc_trade_price").asDouble())
-                                .timestamp(json.get("timestamp").asLong())
-                                .streamType(json.get("stream_type").asText())
-                                .build();
+                        CandleResponseByProvider candle = CandleMapper.map(json);
 
                         // tradingPair + UTC 기준 시각으로 캐시에 저장
                         String key = candle.getMarket() + "-" + candle.getCandleDateTimeUtc();

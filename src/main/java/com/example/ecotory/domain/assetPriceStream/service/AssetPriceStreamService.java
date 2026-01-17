@@ -1,108 +1,117 @@
 package com.example.ecotory.domain.assetPriceStream.service;
 
-import com.example.ecotory.domain.coinAsset.repository.CoinAssetRepository;
 import com.example.ecotory.domain.KrwAsset.dto.response.KrwAssetSummary.*;
-import com.example.ecotory.domain.KrwAsset.entity.KrwAsset;
-import com.example.ecotory.domain.KrwAsset.repository.KrwAssetRepository;
+import com.example.ecotory.domain.KrwAsset.service.KrwAssetService;
+import com.example.ecotory.domain.coinAsset.entity.CoinAsset;
+import com.example.ecotory.domain.coinAsset.repository.CoinAssetRepository;
+import com.example.ecotory.domain.coinAsset.service.CoinAssetService;
 import com.example.ecotory.domain.member.repository.MemberRepository;
-import com.example.ecotory.global.webSocket.price.MarketPriceCache;
-import com.example.ecotory.global.webSocket.provider.response.OrderbookResponseByProvider;
+import com.example.ecotory.global.webSocket.provider.response.TickerResponseByProvider;
+import com.example.ecotory.global.webSocket.provider.service.TickerServiceByProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AssetPriceStreamService {
 
     private final MemberRepository memberRepository;
-    private final KrwAssetRepository krwAssetRepository;
     private final CoinAssetRepository coinAssetRepository;
-    private final MarketPriceCache marketPriceCache;
+    private final TickerServiceByProvider tickerServiceByProvider;
+    private final CoinAssetService coinAssetService;
+    private final KrwAssetService krwAssetService;
 
 
-    // 코인별 평가손익 조회
+    // 코인별 평가손익 조회 = 수량 × (현재가 - 평균단가)) - webshcoket 최신가 기준
+    public double coinProfit(String subject, String market) {
 
-    // 총 평가손익 = 코인별 평가손익의 합??? - webshcoket 최신가 기준 (코인별 평가손익 = 수량 × (현재가 - 평균단가))
-    public TotalProfitResponse getTotalProfit(String subject) {
+       
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+        CoinAsset coinAsset = coinAssetRepository
+                .findByMemberIdAndTradingPair_Market(subject, market) // 마켓으로 코인 자산 조회
+                .orElseThrow(() -> new NoSuchElementException("해당 코인 자산 없음"));
 
+        TickerResponseByProvider ticker = tickerServiceByProvider.getTicker(market);
 
+        if (ticker == null) {
+            throw new RuntimeException("현재가를 가져올 수 없습니다.");
+        }
+
+        double balance = coinAsset.getCoinBalance();   // 코인 수량
+        double currentPrice = ticker.getTradePrice(); // 최신가(현재가)
+        double avgPrice = coinAsset.getAvgBuyPrice();     // 평균 단가(매수평균가)
+        double profit = balance * (currentPrice - avgPrice);
+
+        // 평가손익 계산 = 수량 × (현재가 - 평균단가)
+        return profit;
+    }
+
+    // 총 평가손익 = 코인별 평가손익의 합???
+    public double getTotalProfit(String subject) {
+
+       
+
+        List<CoinAsset> coinAssetList = coinAssetRepository.findAllByMemberId(subject);
+
+        if (coinAssetList.isEmpty()) {
+            throw new NoSuchElementException("코인 자산 없음");
+        }
+
+        double totalProfit = 0.0;
+        for (CoinAsset coinAsset : coinAssetList) {
+
+            String market = coinAsset.getTradingPair().getMarket();
+            double profit = coinProfit(subject, market);
+            totalProfit += profit;
+        }
+
+        return totalProfit;
 
     }
 
-    // 총 평가금액 = 총 매수금액(KrwAsset.totalByAmount) + 총 평가손익(coinAsset.totalProfit)
-    public TotalEvalAmountResponse getTotalEvalAmount(String subject) {
+    // 총 평가금액 = 총 매수금액 + 총 평가손익
+    public double getTotalEvalAmount(String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
-
-        // 멤버 존재 여부 확인
-        List<KrwAsset> KrwAssets = KrwAssetRepository.findByMemberId(subject);
-
-        // 최신 오더북 조회
-        Map<String, OrderbookResponseByProvider> orderbooks = orderbookServiceByProvider.getAllOrderbooks();
+       
 
 
-        // 총 평가금액 계산
-        double totalEvalAmount = KrwAssets.stream()
-                .mapToDouble(a -> {
-                    OrderbookResponseByProvider ob = getLatestOrderbook(a.getTradingPair(), orderbooks);
-                    double price = (ob != null && !ob.getOrderbookUnits().isEmpty()) // 최신가 우선
-                            ? ob.getOrderbookUnits().get(0).getAskPrice() // 현재가
-                            : a.getAvgPrice(); // 없으면 평균단가 사용
-                    return a.getAmount() * price; // 평가금액 = 수량 × 현재가
-                })
-                .sum();
+        long totalBuyAmount = coinAssetService.totalCoinBuyAmount(subject);
+        double totalProfit = getTotalProfit(subject);
+        double totalEvalAmount = totalBuyAmount + totalProfit;
 
-        // 응답 반환
-        return TotalEvalAmountResponse.builder()
-                .success(true)
-                .totalEvalAmount(totalEvalAmount)
-                .build();
+        return totalEvalAmount;
     }
 
-    // 총 보유자산 = 총 평가금액 + 주문 가능 금액(KrwAsset.cashBalance)
-    public TotalAssetsResponse getTotalAssets(String subject) {
+    // 총 보유자산 = 총 평가금액(총 매수금액 + 총 평가손익) + 주문 가능 금액
+    public double getTotalAssets(String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+        long totalCoinBuyAmount = coinAssetService.totalCoinBuyAmount(subject); // 총 매수금액
+        double totalProfit = getTotalProfit(subject); // 총 평가손익
+        long cashBalance = krwAssetService.getCashBalance(subject); // 주문 가능 금액
 
-        // 총 평가금액
-        double totalEvalAmount = getTotalEvalAmount(subject).getTotalEvalAmount();
+        double totalAsset = totalCoinBuyAmount + totalProfit + cashBalance;
 
-        // 주문 가능 금액 (DB에서 직접 가져올 수 있음)
-        double availableAmount = getAvailableAmount(subject).getAvailableAmount();
-
-        return TotalAssetsResponse.builder()
-                .success(true)
-                .totalAssets(totalEvalAmount + availableAmount)
-                .build();
+        return totalAsset;
     }
 
-    // 총 수익률 = (총 평가손익 / 총 매수금액(KrwAsset.totalByAmount)) × 100
-    public TotalProfitRateResponse getTotalProfitRate(String subject) {
+    // 총 수익률 = (총 평가손익 / 총 매수금액) × 100
+    public double getTotalProfitRate(String subject) {
 
-        memberRepository.findById(subject)
-                .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+        double totalProfit = getTotalProfit(subject);
+        long totalBuyAmount = coinAssetService.totalCoinBuyAmount(subject);
+        if (totalBuyAmount == 0) {
+            return 0.0;
+        }
 
+        double totalProfitRate = (totalProfit/totalBuyAmount) * 100;
 
-        double totalProfit = getTotalProfit(subject).getTotalProfit();
-        double totalBuyAmount = TotalBuyAmount(subject).getTotalBuyAmount();
-
-        double profitRate = totalBuyAmount != 0 ? (totalProfit / totalBuyAmount) * 100 : 0;
-
-        return TotalProfitRateResponse.builder()
-                .success(true)
-                .totalProfitRate(profitRate)
-                .build();
+        return totalProfitRate;
     }
-
 }
 
 // 평가 금액 타임라인 조회
