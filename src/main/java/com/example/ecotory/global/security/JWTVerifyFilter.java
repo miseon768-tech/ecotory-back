@@ -55,9 +55,9 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
 
             String subject = jwt.getSubject();
 
-            // ✅ 여기서 로그인 사용자 보장 (실무 핵심)
+            // 여기서 로그인 사용자 보장 (실무 핵심)
             memberRepository.findById(subject)
-                    .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자"));
+                    .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
             // 컨트롤러 / 서비스에서 사용
             request.setAttribute("subject", subject);

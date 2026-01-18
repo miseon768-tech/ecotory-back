@@ -1,64 +1,82 @@
 package com.example.ecotory.domain.member.controller;
 
-import com.example.ecotory.domain.member.dto.response.MemberResponse;
+import com.example.ecotory.domain.member.dto.response.member.ChangePasswordResponse;
+import com.example.ecotory.domain.member.dto.response.member.DeleteMemberResponse;
+import com.example.ecotory.domain.member.dto.response.member.MemberInfoResponse;
+import com.example.ecotory.domain.member.dto.response.member.UpdateMemberResponse;
+import com.example.ecotory.domain.member.entity.Member;
+
 import com.example.ecotory.domain.member.service.MemberService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@SecurityRequirement(name = "bearerAuth")
-@Tag(name = "Member", description = "회원 정보 관련 API")
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
-
 public class MemberController {
+
     private final MemberService memberService;
 
+    // 내 정보 조회
+    @GetMapping("/me")
+    public ResponseEntity<MemberInfoResponse> memberInfo(@RequestAttribute String subject) {
 
-    @Operation(summary = "내 정보 조회", description = "로그인한 사용자의 정보를 조회합니다.")
-    @GetMapping
-    public ResponseEntity<MemberResponse> findById(@RequestAttribute String subject) {
+        Member getMyInfo = memberService.memberInfo(subject);
 
-        MemberResponse response = memberService.findById(subject);
+        MemberInfoResponse response = MemberInfoResponse.builder()
+                .success(true)
+                .id(getMyInfo.getId())
+                .email(getMyInfo.getEmail())
+                .nickname(getMyInfo.getNickname())
+                .createdAt(String.valueOf(getMyInfo.getCreatedAt()))
+                .build();
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED) //201
-                .body(response);
+        return ResponseEntity.ok(response);
     }
 
+    // 계정 정보 수정
+    @PutMapping("/me")
+    public ResponseEntity<UpdateMemberResponse> updateMember(@RequestAttribute String subject,
+                                                             @RequestBody String email,
+                                                             @RequestBody String nickname) {
 
-    @Operation(summary = "계정 정보 수정", description = "로그인한 사용자의 계정 정보를 수정합니다.")
-    @PostMapping
-    public ResponseEntity<?> update(@RequestAttribute String subject) {
-        MemberResponse response = memberService.update(subject);
-        return ResponseEntity
-                .status(HttpStatus.CREATED) //201
-                .body(response);
+        memberService.updateMember(subject, email, nickname);
+
+        UpdateMemberResponse response = UpdateMemberResponse.builder()
+                .success(true)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     // 비밀번호 변경
-    @Operation(summary = "계정 정보 수정", description = "로그인한 사용자의 계정 정보를 수정합니다.")
-    @PostMapping
-    public ResponseEntity<?> update(@RequestAttribute String subject) {
-        MemberResponse response = memberService.update(subject);
-        return ResponseEntity
-                .status(HttpStatus.CREATED) //201
-                .body(response);
+    @PutMapping("/me/password")
+    public ResponseEntity<ChangePasswordResponse> changePassword(@RequestAttribute String subject,
+                                                                 @RequestBody String oldPassword,
+                                                                 @RequestBody String newPassword,
+                                                                 @RequestBody String newPasswordConfirm) {
+
+        memberService.changePassword(subject, oldPassword, newPassword, newPasswordConfirm);
+
+        ChangePasswordResponse response = ChangePasswordResponse.builder()
+                .success(true)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     // 회원 탈퇴
-    @Operation(summary = "계정 정보 수정", description = "로그인한 사용자의 계정 정보를 수정합니다.")
-    @PostMapping
-    public ResponseEntity<?> update(@RequestAttribute String subject) {
-        MemberResponse response = memberService.update(subject);
-        return ResponseEntity
-                .status(HttpStatus.CREATED) //201
-                .body(response);
+    @DeleteMapping("/me")
+    public ResponseEntity<DeleteMemberResponse> deleteMember(@RequestAttribute String subject,
+                                                             @RequestBody String password) {
+
+        memberService.deleteMember(subject, password);
+
+        DeleteMemberResponse response = DeleteMemberResponse.builder()
+                .success(true)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 }

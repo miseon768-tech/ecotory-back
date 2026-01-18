@@ -48,7 +48,7 @@ public class EmailCodeService {
         // 4. 인증 코드 저장
         EmailCode emailCode = new EmailCode();
         emailCode.setCode(code);
-        emailCode.setMember(member);
+        emailCode.setMemberId(member.getId());
         emailCode.setExpiredAt(LocalDateTime.now().plusMinutes(10));
 
         emailCodeRepository.save(emailCode);

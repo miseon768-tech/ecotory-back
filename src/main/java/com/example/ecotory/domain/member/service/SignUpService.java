@@ -29,7 +29,7 @@ public class SignUpService {
 
         String encoded = passwordEncoder.encode(signUpRequest.getPassword());
 
-        Member member = com.example.ecotory.domain.member.entity.Member.builder()
+        Member member = Member.builder()
                 .email(signUpRequest.getEmail())
                 .password(encoded)
                 .nickname(signUpRequest.getNickname())
