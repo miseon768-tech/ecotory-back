@@ -18,7 +18,4 @@ public interface MemberRepository extends JpaRepository<Member, String> {
     // 이메일 존재 여부 확인
     boolean existsByEmail(String email);
 
-    /*// 소셜 로그인 제공자 + 제공자 ID로 멤버 조회
-    Optional<Member> findByProviderAndProviderId(String provider, String providerId);
-*/
 }
