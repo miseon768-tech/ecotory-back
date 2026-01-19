@@ -2,11 +2,9 @@ package com.example.ecotory.domain.assetPriceStream.service;
 
 import com.example.ecotory.domain.KrwAsset.service.KrwAssetService;
 import com.example.ecotory.domain.assetPriceStream.model.PortfolioItem;
-import com.example.ecotory.domain.assetPriceStream.response.AssetDashboardResponse;
 import com.example.ecotory.domain.coinAsset.entity.CoinAsset;
 import com.example.ecotory.domain.coinAsset.repository.CoinAssetRepository;
 import com.example.ecotory.domain.coinAsset.service.CoinAssetService;
-import com.example.ecotory.domain.member.repository.MemberRepository;
 import com.example.ecotory.global.webSocket.provider.response.TickerResponseByProvider;
 import com.example.ecotory.global.webSocket.provider.service.TickerServiceByProvider;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +20,6 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class AssetPriceStreamService {
 
-    private final MemberRepository memberRepository;
     private final CoinAssetRepository coinAssetRepository;
     private final TickerServiceByProvider tickerServiceByProvider;
     private final CoinAssetService coinAssetService;
