@@ -34,7 +34,8 @@ public class CommentService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "커뮤니티 없음")); // 404
 
 
-        Comment comment = addCommentRequest.toEntity(member, post);
+        Comment comment = addCommentRequest.getPostId();
+
 
         Comment saved = commentRepository.save(comment);
 

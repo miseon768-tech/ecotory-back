@@ -1,16 +1,17 @@
-package com.example.ecotory.domain.social.common;
+package com.example.ecotory.domain.social.entity;
 
 import com.example.ecotory.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-@Getter
 @Setter
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Entity
+
 public class Social {
 
     @Id
@@ -18,17 +19,13 @@ public class Social {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(nullable = false)
-    private String provider;   // GOOGLE, NAVER, KAKAO
+    private String provider;
 
-    @Column(nullable = false)
-    private String providerId; // provider 고유 id
+    private String providerId;
 
-    private String nickname;
-    private String email;
-    private String picture;
 }
