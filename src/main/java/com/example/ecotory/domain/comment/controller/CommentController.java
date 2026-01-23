@@ -1,7 +1,5 @@
 package com.example.ecotory.domain.comment.controller;
 
-import com.example.ecotory.domain.comment.dto.request.AddCommentRequest;
-import com.example.ecotory.domain.comment.dto.request.UpdateCommentRequest;
 import com.example.ecotory.domain.comment.dto.response.comment.*;
 import com.example.ecotory.domain.comment.entity.Comment;
 import com.example.ecotory.domain.comment.service.CommentService;
@@ -12,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Comment", description = "댓글 관련 API")
@@ -28,9 +24,10 @@ public class CommentController {
     @Operation(summary = "댓글 작성", description = "특정 대상(글, 동영상 등)에 댓글을 작성합니다.")
     @PostMapping
     public ResponseEntity<?> addComment(@RequestAttribute String subject,
-                                        @RequestBody String content)  {
+                                        @RequestBody String content,
+                                        @RequestParam String postId)  {
 
-        Comment comment = commentService.addComment(subject, content);
+        Comment comment = commentService.addComment(subject, content, postId);
 
         AddCommentResponse response = AddCommentResponse.builder()
                 .comment(comment)
@@ -46,9 +43,9 @@ public class CommentController {
     @PutMapping("/{commentId}")
     public ResponseEntity<?> updateComment(@PathVariable String commentId,
                                            @RequestAttribute String subject,
-                                           @RequestBody UpdateCommentRequest updateCommentRequest)  {
+                                           @RequestBody String content)  {
 
-        Comment comment = commentService.updateComment(commentId, subject, updateCommentRequest);
+        Comment comment = commentService.updateComment(commentId, subject, content);
 
         UpdateCommentResponse response = UpdateCommentResponse.builder()
                 .comment(comment)

@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 
@@ -27,14 +28,12 @@ public class CommentLikeService {
     // 댓글 좋아요
     public CommentLikeResponse createCommentLike(String commentId, String subject) {
 
-        Member member = memberRepository.findById(subject)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "멤버를 찾을 수 없습니다.")); //404
-
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "댓글이 존재하지 않습니다.")); // 404
+        commentRepository.findById(commentId)
+                .orElseThrow(() -> new NoSuchElementException("댓글 없음"));
 
 
-        Optional<CommentLike> commentLike = commentLikeRepository.findByCommentAndMember(comment, member);
+
+        Optional<CommentLike> commentLike = commentLikeRepository.findByCommentAndMember(commentId, subject);
 
         if (commentLike.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 좋아요를 눌렀습니다."); // 400

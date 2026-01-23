@@ -1,7 +1,5 @@
 package com.example.ecotory.domain.comment.entity;
 
-import com.example.ecotory.domain.member.entity.Member;
-import com.example.ecotory.domain.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;
 

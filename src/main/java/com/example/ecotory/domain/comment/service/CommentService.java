@@ -1,19 +1,16 @@
 package com.example.ecotory.domain.comment.service;
 
-import com.example.ecotory.domain.comment.dto.request.UpdateCommentRequest;
 import com.example.ecotory.domain.comment.dto.response.comment.*;
 import com.example.ecotory.domain.comment.entity.Comment;
 import com.example.ecotory.domain.comment.repository.CommentRepository;
 import com.example.ecotory.domain.post.entity.Post;
 import com.example.ecotory.domain.post.repository.PostRepository;
-import com.example.ecotory.domain.member.entity.Member;
 import com.example.ecotory.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 
 @Service
@@ -24,10 +21,10 @@ public class CommentService {
     private final PostRepository postRepository;
 
     // 댓글 작성
-    public Comment addComment(String subject, String content) {
+    public Comment addComment(String subject, String content, String postId) {
 
-       Post post = postRepository.findById(subject)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "커뮤니티 글 없음"));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
 
         Comment comment = new Comment();
         comment.setContent(content);
@@ -38,31 +35,28 @@ public class CommentService {
     }
 
     // 댓글 수정
-    public UpdateCommentResponse updateComment(String commentId, String subject, UpdateCommentRequest updateCommentRequest) {
+    public Comment updateComment(String commentId, String subject, String content) {
 
-        Comment comment = commentRepository.findById(subject)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "댓글 없음")); // 404
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NoSuchElementException("댓글 없음"));
 
-        if (!comment.getMember().getId().equals(member.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "댓글 수정 권한 없음"); // 403
+        if (!comment.getMember().getId().equals(subject)) {
+            throw new IllegalStateException("댓글 수정 권한 없음"); // 403
         }
 
 
-        return commentRepository.save(updateCommentRequest.toEntity(member));
+        return commentRepository.save(comment);
 
     }
 
     // 댓글 삭제
     public DeleteCommentResponse deleteComment(String commentId, String subject) {
 
-        Member member = memberRepository.findById(subject)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "멤버 없음")); // 404
-
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "댓글 없음")); // 404
+                .orElseThrow(() -> new NoSuchElementException("댓글 없음"));
 
-        if (!comment.getMember().getId().equals(member.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "댓글 삭제 권한 없음"); // 403
+        if (!comment.getMember().getId().equals(subject)) {
+            throw new IllegalStateException("댓글 삭제 권한 없음"); // 403
         }
 
         commentRepository.delete(comment);
@@ -75,11 +69,8 @@ public class CommentService {
     // 댓글 목록 조회(특정 글의 댓글들)
     public GetCommentsByPostResponse getComments(String subject, String postId) {
 
-        Member member = memberRepository.findById(subject)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "멤버 없음")); // 404
-
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "커뮤니티 글 없음")); // 404
+                .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
 
 
         List<Comment> commentList = commentRepository.findByPost(post);
@@ -94,10 +85,7 @@ public class CommentService {
     // 댓글 목록 조회(사용자의 댓글들)
     public GetCommentsByMemberResponse getMyComments(String subject) {
 
-        Member member = memberRepository.findById(subject)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "멤버 없음")); // 404
-
-        List<Comment> commentListByMember = commentRepository.findByMember(member);
+        List<Comment> commentListByMember = commentRepository.findByMember(subject);
 
         return GetCommentsByMemberResponse.builder()
                 .commentListByMember(commentListByMember)
