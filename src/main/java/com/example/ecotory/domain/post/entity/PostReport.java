@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -14,8 +15,6 @@ import java.time.LocalDateTime;
 public class PostReport {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
     private String postId;
@@ -24,4 +23,9 @@ public class PostReport {
     private String reason;
 
     private LocalDateTime reportedAt = LocalDateTime.now();
+
+    @PrePersist
+    public void prePersist() {
+        this.id = UUID.randomUUID().toString().substring(0, 8);
+    }
 }

@@ -33,8 +33,6 @@ public class PostService {
     // 글 작성
     public AddPostResponse createPost(String subject, AddPostRequest addPostRequest) {
 
-       
-
         Post post = new Post();
         post.setTitle(addPostRequest.getTitle());
         post.setContent(addPostRequest.getContent());

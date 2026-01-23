@@ -2,9 +2,9 @@ package com.example.ecotory.domain.post.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -13,9 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostDraft {
+
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
     private String memberId;
@@ -28,6 +27,7 @@ public class PostDraft {
 
     @PrePersist
     public void prePersist() {
+        this.id = UUID.randomUUID().toString().substring(0, 8);
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

@@ -1,6 +1,5 @@
 package com.example.ecotory.domain.comment.service;
 
-import com.example.ecotory.domain.comment.dto.request.AddCommentRequest;
 import com.example.ecotory.domain.comment.dto.request.UpdateCommentRequest;
 import com.example.ecotory.domain.comment.dto.response.comment.*;
 import com.example.ecotory.domain.comment.entity.Comment;
@@ -25,35 +24,23 @@ public class CommentService {
     private final PostRepository postRepository;
 
     // 댓글 작성
-    public AddCommentResponse addComment(String subject, AddCommentRequest addCommentRequest) {
+    public Comment addComment(String subject, String content) {
 
-        Member member = memberRepository.findById(subject)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "멤버 없음")); // 404
+       Post post = postRepository.findById(subject)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "커뮤니티 글 없음"));
 
-        Post post = postRepository.findById(addCommentRequest.getPostId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "커뮤니티 없음")); // 404
+        Comment comment = new Comment();
+        comment.setContent(content);
+        comment.setPost(post);
 
+        return commentRepository.save(comment);
 
-        Comment comment = addCommentRequest.getPostId();
-
-
-        Comment saved = commentRepository.save(comment);
-
-        return AddCommentResponse.builder()
-                .comment(saved)
-                .success(true)
-                .build();
     }
 
     // 댓글 수정
     public UpdateCommentResponse updateComment(String commentId, String subject, UpdateCommentRequest updateCommentRequest) {
 
-
-        Member member = memberRepository.findById(subject)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "멤버 없음")); // 404
-
-
-        Comment comment = commentRepository.findById(commentId)
+        Comment comment = commentRepository.findById(subject)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "댓글 없음")); // 404
 
         if (!comment.getMember().getId().equals(member.getId())) {
@@ -61,12 +48,8 @@ public class CommentService {
         }
 
 
-        Comment updated = commentRepository.save(updateCommentRequest.toEntity(member));
+        return commentRepository.save(updateCommentRequest.toEntity(member));
 
-        return UpdateCommentResponse.builder()
-                .comment(updated)
-                .success(true)
-                .build();
     }
 
     // 댓글 삭제

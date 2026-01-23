@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -14,7 +15,6 @@ import java.time.LocalDateTime;
 public class EmailCode {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     private String memberId;
@@ -26,6 +26,7 @@ public class EmailCode {
 
     @PrePersist
     public void prePersist() {
+        this.id = UUID.randomUUID().toString().substring(0, 8);
         createdAt = LocalDateTime.now();
     }
 

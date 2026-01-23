@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -16,8 +17,6 @@ import java.time.LocalDateTime;
 public class Post {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
 
@@ -35,6 +34,7 @@ public class Post {
 
     @PrePersist
     public void prePersist() {
+        this.id = UUID.randomUUID().toString().substring(0, 8);
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

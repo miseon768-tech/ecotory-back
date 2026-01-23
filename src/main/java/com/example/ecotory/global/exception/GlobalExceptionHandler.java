@@ -1,4 +1,4 @@
-package com.example.ecotory.global.common.exception;
+package com.example.ecotory.global.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +19,11 @@ public class GlobalExceptionHandler {
     }
 
     /*
-    memberRepository.findById(subject)
-            .orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+    memberRepository.findById(subject).orElseThrow(() -> new NoSuchElementException("멤버 없음"));
 
-    tradingPairRepository.findById(addAssetRequest.getTradingPairId())
-            .orElseThrow(() -> new NoSuchElementException("트레이딩 페어 없음"));
+    tradingPairRepository.findById(addAssetRequest.getTradingPairId()).orElseThrow(() -> new NoSuchElementException("트레이딩 페어 없음"));
 
-    postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
+    postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
     */
 
     // 403 / 409 - 상태/권한 문제(자산 수정 권한 없음, 시뮬레이션 안 함)

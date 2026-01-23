@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -18,13 +19,16 @@ import java.time.LocalDateTime;
 public class Comment {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
 
-    private String postId;
-    private String memberId;
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     private String content;
 
@@ -34,6 +38,7 @@ public class Comment {
 
     @PrePersist
     public void prePersist() {
+        this.id = UUID.randomUUID().toString().substring(0, 8);
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

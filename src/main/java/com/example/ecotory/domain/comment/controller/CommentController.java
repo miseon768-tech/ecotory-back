@@ -3,6 +3,7 @@ package com.example.ecotory.domain.comment.controller;
 import com.example.ecotory.domain.comment.dto.request.AddCommentRequest;
 import com.example.ecotory.domain.comment.dto.request.UpdateCommentRequest;
 import com.example.ecotory.domain.comment.dto.response.comment.*;
+import com.example.ecotory.domain.comment.entity.Comment;
 import com.example.ecotory.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -27,12 +28,17 @@ public class CommentController {
     @Operation(summary = "댓글 작성", description = "특정 대상(글, 동영상 등)에 댓글을 작성합니다.")
     @PostMapping
     public ResponseEntity<?> addComment(@RequestAttribute String subject,
-                                        @RequestBody AddCommentRequest addCommentRequest)  {
+                                        @RequestBody String content)  {
 
-        AddCommentResponse resposne = commentService.addComment(subject, addCommentRequest);
+        Comment comment = commentService.addComment(subject, content);
+
+        AddCommentResponse response = AddCommentResponse.builder()
+                .comment(comment)
+                .success(true)
+                .build();
 
         return ResponseEntity.status(HttpStatus.OK) //200
-                .body(resposne);
+                .body(response);
     }
 
 
@@ -42,7 +48,12 @@ public class CommentController {
                                            @RequestAttribute String subject,
                                            @RequestBody UpdateCommentRequest updateCommentRequest)  {
 
-        UpdateCommentResponse response = commentService.updateComment(commentId, subject, updateCommentRequest);
+        Comment comment = commentService.updateComment(commentId, subject, updateCommentRequest);
+
+        UpdateCommentResponse response = UpdateCommentResponse.builder()
+                .comment(comment)
+                .success(true)
+                .build();
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);

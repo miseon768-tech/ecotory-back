@@ -3,7 +3,8 @@ package com.example.ecotory.domain.social.entity;
 import com.example.ecotory.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
+
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -15,8 +16,6 @@ import org.hibernate.annotations.GenericGenerator;
 public class Social {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
 
@@ -28,4 +27,9 @@ public class Social {
 
     private String providerId;
 
+
+    @PrePersist
+    public void prePersist() {
+        this.id = UUID.randomUUID().toString().substring(0, 8);
+    }
 }
