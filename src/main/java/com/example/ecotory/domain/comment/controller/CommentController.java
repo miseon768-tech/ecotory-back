@@ -84,10 +84,7 @@ public class CommentController {
 
     @Operation(summary = "사용자 댓글 목록 조회", description = "특정 사용자가 작성한 댓글 목록을 조회합니다.")
     @GetMapping("/user/{memberId}")
-    public ResponseEntity<?> getCommentsByMember(@PathVariable String memberId)  {
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    public ResponseEntity<?> getCommentsByMember(@PathVariable Member member)  {
 
         GetCommentsByMemberResponse response = commentService.getMyComments(member);
 

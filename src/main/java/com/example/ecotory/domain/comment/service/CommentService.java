@@ -39,10 +39,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NoSuchElementException("댓글 없음"));
 
-        if (!comment.getMember().getId().equals(member)) {
-            throw new IllegalStateException("댓글 수정 권한 없음"); // 403
-        }
-
+        comment.setContent(content);
 
         return commentRepository.save(comment);
 
@@ -54,9 +51,6 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NoSuchElementException("댓글 없음"));
 
-        if (!comment.getMember().getId().equals(member)) {
-            throw new IllegalStateException("댓글 삭제 권한 없음"); // 403
-        }
 
         commentRepository.delete(comment);
 
