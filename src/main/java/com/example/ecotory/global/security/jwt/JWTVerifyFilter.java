@@ -7,6 +7,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import com.example.ecotory.domain.member.entity.Member;
 import com.example.ecotory.domain.member.repository.MemberRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,14 +66,23 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
             throw new IllegalStateException("사용자 토큰이 일치하지 않습니다.");
         }
 
-        // 인증시에 사용했던 계정의 ID를 설정해서 보냄
-        String subject = jwt.getSubject();
+        // 인증시에 사용했던 계정의 정보를 subject(JSON)에서 복원
+        String subjectJson = jwt.getSubject();
+        if (subjectJson == null || subjectJson.isEmpty()) {
+            throw new IllegalStateException("토큰에 사용자 정보가 없습니다.");
+        }
 
-        Member member = memberRepository.findById(subject).orElseThrow(() -> new NoSuchElementException("직원 정보가 없습니다."));
+        ObjectMapper objectMapper = new ObjectMapper();
+        Member tokenMember;
+        try {
+            tokenMember = objectMapper.readValue(subjectJson, Member.class);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("토큰 파싱에 실패했습니다.", e);
+        }
 
-        //request.setAttribute("memberId", subject);
+        Member member = memberRepository.findById(tokenMember.getId()).orElseThrow(() -> new NoSuchElementException("직원 정보가 없습니다."));
+
         request.setAttribute("member", member);
-
 
         filterChain.doFilter(request,response);
     }

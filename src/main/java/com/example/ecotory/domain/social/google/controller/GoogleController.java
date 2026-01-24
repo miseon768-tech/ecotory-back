@@ -8,6 +8,8 @@ import com.example.ecotory.domain.social.google.response.GoogleResponse;
 import com.example.ecotory.domain.social.google.service.GoogleService;
 import com.example.ecotory.domain.social.google.response.GoogleTokenResponse;
 import com.example.ecotory.domain.social.google.response.GoogleUserInfoResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,11 +37,19 @@ public class GoogleController {
         // 3) DB 저장 (기존 회원이면 insert 없음)
         Member member = googleService.upsertGoogleMember(userInfo);
 
-        // 4) JWT 발급
+        // 4) JWT 발급 (subject에 Member JSON 저장)
+        ObjectMapper objectMapper = new ObjectMapper();
+        String memberJson;
+        try {
+            memberJson = objectMapper.writeValueAsString(member);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("토큰 생성 중 사용자 직렬화 실패", e);
+        }
+
         String jwt = JWT.create()
                 .withIssuer("ecotory")
-                .withSubject(member.getId())
-                .sign(Algorithm.HMAC256("YOUR_SECRET_KEY"));
+                .withSubject(memberJson)
+                .sign(Algorithm.HMAC256("ecotoryKey"));
 
         GoogleResponse authResponse = GoogleResponse.builder()
                 .member(member)

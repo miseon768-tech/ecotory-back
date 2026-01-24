@@ -4,6 +4,7 @@ import com.example.ecotory.domain.post.dto.request.AddPostRequest;
 import com.example.ecotory.domain.post.dto.request.UpdatePostRequest;
 import com.example.ecotory.domain.post.dto.response.post.*;
 import com.example.ecotory.domain.post.service.PostService;
+import com.example.ecotory.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,10 +29,10 @@ public class PostController {
 
     @Operation(summary = "글 작성", description = "커뮤니티에 새 글을 작성합니다.")
     @PostMapping
-    public ResponseEntity<?> createPost(@RequestAttribute String subject,
+    public ResponseEntity<?> createPost(@RequestAttribute Member member,
                                         @RequestBody AddPostRequest addPostRequest)  {
 
-        AddPostResponse response = postService.createPost(subject, addPostRequest);
+        AddPostResponse response = postService.createPost(member, addPostRequest);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -41,10 +42,10 @@ public class PostController {
     @Operation(summary = "글 수정", description = "커뮤니티에 작성된 글을 수정합니다.")
     @PutMapping("/{postId}")
     public ResponseEntity<?> updatePost(@PathVariable String postId,
-                                        @RequestAttribute String subject,
+                                        @RequestAttribute Member member,
                                         @RequestBody UpdatePostRequest updatePostRequest)  {
 
-        UpdatePostResponse response = postService.updatePost(postId, subject, updatePostRequest);
+        UpdatePostResponse response = postService.updatePost(postId, member, updatePostRequest);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -53,9 +54,9 @@ public class PostController {
     @Operation(summary = "글 삭제", description = "커뮤니티에 작성된 글을 삭제합니다.")
     @DeleteMapping("/{postId}")
     public ResponseEntity<?> deletePost(@PathVariable String postId,
-                                        @RequestAttribute String subject)  {
+                                        @RequestAttribute Member member)  {
 
-        postService.deletePost(postId, subject);
+        postService.deletePost(postId, member);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT) //204
                 .build();
@@ -64,9 +65,9 @@ public class PostController {
 
     @Operation(summary = "글 전체 목록 조회", description = "커뮤니티에 작성된 모든 글을 조회합니다.")
     @GetMapping
-    public ResponseEntity<GetAllPostResponse> getPosts(@RequestAttribute String subject) {
+    public ResponseEntity<GetAllPostResponse> getPosts(@RequestAttribute Member member) {
 
-        GetAllPostResponse response = postService.getAllPosts(subject);
+        GetAllPostResponse response = postService.getAllPosts(member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -74,10 +75,10 @@ public class PostController {
 
     @Operation(summary = "단일 글 조회", description = "커뮤니티에 작성된 특정 글을 조회합니다.")
     @GetMapping("/{postId}")
-    public ResponseEntity<GetPostResponse> getPostById(@RequestAttribute String subject,
+    public ResponseEntity<GetPostResponse> getPostById(@RequestAttribute Member member,
                                                        @PathVariable String postId) {
 
-        GetPostResponse response = postService.getPost(subject, postId);
+        GetPostResponse response = postService.getPost(postId, member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -85,9 +86,9 @@ public class PostController {
 
     @Operation(summary = "내가 쓴 글 조회", description = "특정 사용자가 작성한 글 목록을 조회합니다.")
     @GetMapping("/me")
-    public ResponseEntity<GetMyPostResponse> getMyPostByMember(@RequestAttribute String subject)  {
+    public ResponseEntity<GetMyPostResponse> getMyPostByMember(@RequestAttribute Member member)  {
 
-        GetMyPostResponse response = postService.getMyPostByMember(subject);
+        GetMyPostResponse response = postService.getMyPostByMember(member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -95,10 +96,10 @@ public class PostController {
 
     @Operation(summary = "키워드로 글 검색", description = "제목 또는 내용에 특정 키워드가 포함된 글을 조회합니다.")
     @GetMapping("/keyword")
-    public ResponseEntity<GetPostByKeywordResponse> searchPosts(@RequestAttribute String subject,
+    public ResponseEntity<GetPostByKeywordResponse> searchPosts(@RequestAttribute Member member,
                                                                 @RequestParam String keyword) {
 
-        GetPostByKeywordResponse response = postService.searchPosts(subject, keyword);
+        GetPostByKeywordResponse response = postService.searchPosts(member, keyword);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -107,10 +108,10 @@ public class PostController {
     @Operation(summary = "파일 업로드", description = "게시글에 파일/이미지를 업로드합니다.")
     @PostMapping("/{postId}/attachments")
     public ResponseEntity<UploadFilesResponse> uploadPostFiles(@PathVariable String postId,
-                                                               @RequestAttribute String subject,
+                                                               @RequestAttribute Member member,
                                                                @RequestParam("files") List<MultipartFile> files)  {
 
-        UploadFilesResponse response = postService.uploadFiles(postId, subject, files);
+        UploadFilesResponse response = postService.uploadFiles(postId, member, files);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -138,4 +139,3 @@ public class PostController {
     }
 
 }
-

@@ -26,14 +26,14 @@ public class CommentLikeService {
     private final CommentRepository commentRepository;
 
     // 댓글 좋아요
-    public CommentLikeResponse createCommentLike(String commentId, String subject) {
+    public CommentLikeResponse createCommentLike(String commentId, Member member) {
 
-        commentRepository.findById(commentId)
+        Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NoSuchElementException("댓글 없음"));
 
 
 
-        Optional<CommentLike> commentLike = commentLikeRepository.findByCommentAndMember(commentId, subject);
+        Optional<CommentLike> commentLike = commentLikeRepository.findByCommentIdAndMemberId(comment.getId(), member.getId());
 
         if (commentLike.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 좋아요를 눌렀습니다."); // 400
@@ -41,8 +41,8 @@ public class CommentLikeService {
 
 
         CommentLike newLike = CommentLike.builder()
-                .comment(comment)
-                .member(member)
+                .commentId(comment.getId())
+                .memberId(member.getId())
                 .build();
 
         CommentLike savedLike = commentLikeRepository.save(newLike);
@@ -55,15 +55,15 @@ public class CommentLikeService {
     }
 
     // 댓글 좋아요 취소
-    public CommentLikeCancelResponse deleteCommentLike(String commentId, String subject) {
+    public CommentLikeCancelResponse deleteCommentLike(String commentId, Member member) {
 
-        Member member = memberRepository.findById(subject)
+        Member existingMember = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "멤버를 찾을 수 없습니다.")); //404
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "댓글이 존재하지 않습니다.")); // 404
 
-        CommentLike existingLike = commentLikeRepository.findByCommentAndMember(comment, member)
+        CommentLike existingLike = commentLikeRepository.findByCommentIdAndMemberId(comment.getId(), existingMember.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "좋아요를 누르지 않았습니다.")); // 400
 
         // 삭제 전 existingLike를 보관

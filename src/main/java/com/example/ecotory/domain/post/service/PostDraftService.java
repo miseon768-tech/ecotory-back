@@ -5,13 +5,11 @@ import com.example.ecotory.domain.post.dto.response.postDraft.GetDraftResponse;
 import com.example.ecotory.domain.post.dto.response.postDraft.SaveDraftResponse;
 import com.example.ecotory.domain.post.entity.PostDraft;
 import com.example.ecotory.domain.post.repository.PostDraftRepository;
+import com.example.ecotory.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
 @Service
@@ -22,7 +20,7 @@ public class PostDraftService {
     private final MemberRepository memberRepository;
 
     // 임시글 저장
-    public SaveDraftResponse saveDraft(String subject, String title, String content) {
+    public SaveDraftResponse saveDraft(Member member, String title, String content) {
 
        
 
@@ -42,11 +40,11 @@ public class PostDraftService {
     }
 
     // 작성자 기준 임시글 불러오기
-    public GetDraftResponse getDraft(String subject) {
+    public GetDraftResponse getDraft(Member member) {
        
 
         List<PostDraft> draftList = postDraftRepository
-                .findByMemberOrderByUpdatedAtDesc(subject);
+                .findByMemberOrderByUpdatedAtDesc(member);
 
         return GetDraftResponse.builder()
                 .draftList(draftList)

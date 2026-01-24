@@ -8,6 +8,7 @@ import com.example.ecotory.domain.post.entity.PostAttachment;
 import com.example.ecotory.domain.post.repository.PostAttachmentRepository;
 import com.example.ecotory.domain.post.repository.PostRepository;
 import com.example.ecotory.domain.member.repository.MemberRepository;
+import com.example.ecotory.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class PostService {
     private final PostAttachmentRepository postAttachmentRepository;
 
     // 글 작성
-    public AddPostResponse createPost(String subject, AddPostRequest addPostRequest) {
+    public AddPostResponse createPost(Member member, AddPostRequest addPostRequest) {
 
         Post post = new Post();
         post.setTitle(addPostRequest.getTitle());
@@ -43,14 +44,14 @@ public class PostService {
     }
 
     // 글 수정
-    public UpdatePostResponse updatePost(String postId, String subject, UpdatePostRequest updatePostRequest) {
+    public UpdatePostResponse updatePost(String postId, Member member, UpdatePostRequest updatePostRequest) {
 
        
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
 
-        if (!post.getMemberId().equals(subject)) {
+        if (!post.getMemberId().equals(member)) {
             throw new IllegalStateException("글 수정 권한 없음"); //403
         }
 
@@ -64,14 +65,14 @@ public class PostService {
     }
 
     // 글 삭제
-    public DeletePostResponse deletePost(String postId, String subject) {
+    public DeletePostResponse deletePost(String postId, Member member) {
 
        
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
 
-        if (!post.getMemberId().equals(subject)) {
+        if (!post.getMemberId().equals(member)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "글 삭제 권한이 없습니다."); //403
         }
 
@@ -81,7 +82,7 @@ public class PostService {
     }
 
     // 글 전체 목록 조회
-    public GetAllPostResponse getAllPosts(String subject) {
+    public GetAllPostResponse getAllPosts(Member member) {
 
        
 
@@ -95,7 +96,7 @@ public class PostService {
     }
 
     // 단일 글 조회
-    public GetPostResponse getPost(String postId, String subject) {
+    public GetPostResponse getPost(String postId, Member member) {
 
        
 
@@ -109,11 +110,11 @@ public class PostService {
     }
 
     // 내가 쓴 글 조회
-    public GetMyPostResponse getMyPostByMember(String subject) {
+    public GetMyPostResponse getMyPostByMember(Member member) {
 
        
 
-        List<Post> mypostList = postRepository.findByMember(subject);
+        List<Post> mypostList = postRepository.findByMember(member);
 
         if (mypostList.isEmpty()) {
             throw new NoSuchElementException("내가 쓴 글 없음");
@@ -123,7 +124,7 @@ public class PostService {
     }
 
     // 키워드로 제목/내용 글 검색
-    public GetPostByKeywordResponse searchPosts(String subject, String keyword) {
+    public GetPostByKeywordResponse searchPosts(Member member, String keyword) {
 
        
 
@@ -140,7 +141,7 @@ public class PostService {
     }
 
     // 파일 올리기
-    public UploadFilesResponse uploadFiles(String postId, String subject, List<MultipartFile> files) {
+    public UploadFilesResponse uploadFiles(String postId, Member member, List<MultipartFile> files) {
 
        
 
@@ -217,7 +218,7 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
 
-/*        if (!post.getMember().getId().equals(subject)) {
+/*        if (!post.getMember().getId().equals(member)) {
             throw new RuntimeException("글 고정 권한이 없습니다."); //403
         }*/
 
@@ -231,4 +232,3 @@ public class PostService {
     }
 
 }
-

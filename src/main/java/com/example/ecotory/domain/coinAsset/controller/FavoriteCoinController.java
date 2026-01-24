@@ -5,6 +5,7 @@ import com.example.ecotory.domain.coinAsset.dto.response.FavoriteCoin.DeleteAllF
 import com.example.ecotory.domain.coinAsset.dto.response.FavoriteCoin.DeleteFavoriteCoinResponse;
 import com.example.ecotory.domain.coinAsset.dto.response.FavoriteCoin.GetFavoriteCoinsResponse;
 import com.example.ecotory.domain.coinAsset.service.FavoriteCoinService;
+import com.example.ecotory.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,10 +30,10 @@ public class FavoriteCoinController {
 
     @Operation(summary = "관심 코인 추가", description = "사용자가 관심있는 코인을 추가합니다.")
     @PostMapping
-    public ResponseEntity<AddFavoriteCoinResponse> addFavoriteCoin(@RequestAttribute String subject,
+    public ResponseEntity<AddFavoriteCoinResponse> addFavoriteCoin(@RequestAttribute Member member,
                                                                    @RequestBody String coinInput) {
 
-        AddFavoriteCoinResponse response = favoriteCoinService.addFavoriteCoin(subject, coinInput);
+        AddFavoriteCoinResponse response = favoriteCoinService.addFavoriteCoin(member, coinInput);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -41,9 +42,9 @@ public class FavoriteCoinController {
 
     @Operation(summary = "관심 코인 조회", description = "사용자가 추가한 관심 코인 목록을 조회합니다.")
     @GetMapping
-    public ResponseEntity<GetFavoriteCoinsResponse> getFavoriteCoins(@RequestAttribute String subject) {
+    public ResponseEntity<GetFavoriteCoinsResponse> getFavoriteCoins(@RequestAttribute Member member) {
 
-        GetFavoriteCoinsResponse response = favoriteCoinService.getFavoriteCoins(subject);
+        GetFavoriteCoinsResponse response = favoriteCoinService.getFavoriteCoins(member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -51,10 +52,10 @@ public class FavoriteCoinController {
 
     @Operation(summary = "관심 코인 선택 삭제", description = "사용자가 추가한 관심 코인을 선택 삭제합니다.")
     @DeleteMapping("/select")
-    public ResponseEntity<?> deleteFavoriteCoin(@RequestAttribute String subject,
+    public ResponseEntity<?> deleteFavoriteCoin(@RequestAttribute Member member,
                                                 @RequestBody List<Long> tradingPairIds) {
 
-        DeleteFavoriteCoinResponse response = favoriteCoinService.deleteFavoriteCoin(subject, tradingPairIds);
+        DeleteFavoriteCoinResponse response = favoriteCoinService.deleteFavoriteCoin(member, tradingPairIds);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -62,12 +63,11 @@ public class FavoriteCoinController {
 
     @Operation(summary = "관심 코인 전체 삭제", description = "사용자가 추가한 관심 코인을 전체 삭제합니다.")
     @DeleteMapping
-    public ResponseEntity<?> deleteAllFavoriteCoins(@RequestAttribute String subject) {
+    public ResponseEntity<?> deleteAllFavoriteCoins(@RequestAttribute Member member) {
 
-        DeleteAllFavoriteCoinResponse response = favoriteCoinService.deleteAllFavoriteCoins(subject);
+        DeleteAllFavoriteCoinResponse response = favoriteCoinService.deleteAllFavoriteCoins(member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
     }
 }
-

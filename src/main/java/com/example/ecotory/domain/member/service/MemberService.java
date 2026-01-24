@@ -14,31 +14,31 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     // 회원 정보 조회
-    public Member memberInfo(String subject) {
-        return memberRepository.findById(subject)
+    public Member memberInfo(Member member) {
+        return memberRepository.findById(member.getId())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
     }
 
     // 계정 정보 수정
-    public void updateMember(String subject, String email, String nickname) {
+    public void updateMember(Member member, String email, String nickname) {
 
-        Member member = memberRepository.findById(subject)
+        Member existingMember = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        member.setEmail(email);
-        member.setNickname(nickname);
+        existingMember.setEmail(email);
+        existingMember.setNickname(nickname);
 
-        memberRepository.save(member);
+        memberRepository.save(existingMember);
     }
 
     // 비밀번호 변경
-    public void changePassword(String subject, String oldPassword, String newPassword, String newPasswordConfirm) {
+    public void changePassword(Member member, String oldPassword, String newPassword, String newPasswordConfirm) {
 
-        Member member = memberRepository.findById(subject)
+        Member existingMember = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        if (!passwordEncoder.matches(oldPassword, member.getPassword())) {
+        if (!passwordEncoder.matches(oldPassword, existingMember.getPassword())) {
             throw new RuntimeException("현재 비밀번호가 일치하지 않습니다.");
         }
 
@@ -46,20 +46,20 @@ public class MemberService {
             throw new RuntimeException("새로운 비밀번호가 일치하지 않습니다.");
         }
 
-        member.setPassword(passwordEncoder.encode(newPassword));
-        memberRepository.save(member);
+        existingMember.setPassword(passwordEncoder.encode(newPassword));
+        memberRepository.save(existingMember);
     }
 
     // 회원 탈퇴
-    public void deleteMember(String subject, String password) {
+    public void deleteMember(Member member, String password) {
 
-        Member member = memberRepository.findById(subject)
+        Member existingMember = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        if (!passwordEncoder.matches(password, member.getPassword())) {
+        if (!passwordEncoder.matches(password, existingMember.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
-        memberRepository.delete(member);
+        memberRepository.delete(existingMember);
     }
 }

@@ -3,9 +3,9 @@ package com.example.ecotory.domain.comment.service;
 import com.example.ecotory.domain.comment.dto.response.comment.*;
 import com.example.ecotory.domain.comment.entity.Comment;
 import com.example.ecotory.domain.comment.repository.CommentRepository;
+import com.example.ecotory.domain.member.entity.Member;
 import com.example.ecotory.domain.post.entity.Post;
 import com.example.ecotory.domain.post.repository.PostRepository;
-import com.example.ecotory.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ public class CommentService {
     private final PostRepository postRepository;
 
     // 댓글 작성
-    public Comment addComment(String subject, String content, String postId) {
+    public Comment addComment(Member member, String content, String postId) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
@@ -34,12 +34,12 @@ public class CommentService {
     }
 
     // 댓글 수정
-    public Comment updateComment(String commentId, String subject, String content) {
+    public Comment updateComment(String commentId, Member member, String content) {
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NoSuchElementException("댓글 없음"));
 
-        if (!comment.getMember().getId().equals(subject)) {
+        if (!comment.getMember().getId().equals(member)) {
             throw new IllegalStateException("댓글 수정 권한 없음"); // 403
         }
 
@@ -49,12 +49,12 @@ public class CommentService {
     }
 
     // 댓글 삭제
-    public DeleteCommentResponse deleteComment(String commentId, String subject) {
+    public DeleteCommentResponse deleteComment(String commentId, Member member) {
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NoSuchElementException("댓글 없음"));
 
-        if (!comment.getMember().getId().equals(subject)) {
+        if (!comment.getMember().getId().equals(member)) {
             throw new IllegalStateException("댓글 삭제 권한 없음"); // 403
         }
 
@@ -66,7 +66,7 @@ public class CommentService {
     }
 
     // 댓글 목록 조회(특정 글의 댓글들)
-    public GetCommentsByPostResponse getComments(String subject, String postId) {
+    public GetCommentsByPostResponse getComments(Member member, String postId) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
@@ -82,9 +82,9 @@ public class CommentService {
     }
 
     // 댓글 목록 조회(사용자의 댓글들)
-    public GetCommentsByMemberResponse getMyComments(String subject) {
+    public GetCommentsByMemberResponse getMyComments(Member member) {
 
-        List<Comment> commentListByMember = commentRepository.findByMember(subject);
+        List<Comment> commentListByMember = commentRepository.findByMember(member);
 
         return GetCommentsByMemberResponse.builder()
                 .commentListByMember(commentListByMember)

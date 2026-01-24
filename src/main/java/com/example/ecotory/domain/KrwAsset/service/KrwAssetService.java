@@ -7,6 +7,7 @@ import com.example.ecotory.domain.KrwAsset.entity.KrwAsset;
 import com.example.ecotory.domain.KrwAsset.repository.KrwAssetRepository;
 import com.example.ecotory.domain.coinAsset.repository.CoinAssetRepository;
 import com.example.ecotory.domain.member.repository.MemberRepository;
+import com.example.ecotory.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class KrwAssetService {
     private final CoinAssetRepository coinAssetRepository;
 
     // 자산 추가
-    public KrwAssetCreateResponse addAsset(String subject, AddAssetRequest addAssetRequest) {
+    public KrwAssetCreateResponse addAsset(Member member, AddAssetRequest addAssetRequest) {
 
        
 
@@ -38,14 +39,14 @@ public class KrwAssetService {
     }
 
     // 자산 수정
-    public AssetUpdateResponse updateAsset(String KrwAssetId, String subject, UpdateAssetRequest updateAssetRequest) {
+    public AssetUpdateResponse updateAsset(String KrwAssetId, Member member, UpdateAssetRequest updateAssetRequest) {
 
        
 
         KrwAsset KrwAsset = krwAssetRepository.findById(KrwAssetId)
                 .orElseThrow(() -> new NoSuchElementException("자산 없음"));
 
-        if (!KrwAsset.getMemberId().equals(subject)) {
+        if (!KrwAsset.getMemberId().equals(member)) {
             throw new IllegalStateException("자산 수정 권한 없음");
         }
 
@@ -63,14 +64,14 @@ public class KrwAssetService {
     }
 
     // 자산 삭제
-    public AssetDeleteResponse deleteAsset(String KRWAssetId, String subject) {
+    public AssetDeleteResponse deleteAsset(String KRWAssetId, Member member) {
 
        
 
         KrwAsset KRWAsset = krwAssetRepository.findById(KRWAssetId)
                 .orElseThrow(() -> new NoSuchElementException("자산 없음"));
 
-        if (!KRWAsset.getMemberId().equals(subject)) {
+        if (!KRWAsset.getMemberId().equals(member)) {
             throw new IllegalStateException("자산 삭제 권한 없음");
         }
 
@@ -82,12 +83,12 @@ public class KrwAssetService {
     }
 
     // 특정 멤버 자산 조회
-    public KrwAssetByMemberResponse KRWAssetByMember(String subject) {
+    public KrwAssetByMemberResponse KRWAssetByMember(Member member) {
 
        
 
 
-        List<KrwAsset> krwAssetList = krwAssetRepository.findByMemberId(subject);
+        List<KrwAsset> krwAssetList = krwAssetRepository.findByMemberId(member);
 
 
         return KrwAssetByMemberResponse.builder()
@@ -97,9 +98,9 @@ public class KrwAssetService {
     }
 
     // 주문 가능 금액(=보유 KRW) 입력 및 수정 : 사용자가 직접 입력, 추가 금액 기재시 더함? 더할 필요가 있나 그냥 수정을 하면 될듯
-    public long upsertCashBalance(String subject, long amount) {
+    public long upsertCashBalance(Member member, long amount) {
 
-        KrwAsset krwAsset = krwAssetRepository.findByMember(subject)
+        KrwAsset krwAsset = krwAssetRepository.findByMember(member)
                 .orElseThrow(() -> new NoSuchElementException("KRW 자산 없음"));
 
         if (amount <= 0) {
@@ -115,9 +116,9 @@ public class KrwAssetService {
     }
 
     // 주문 가능 금액 조회
-    public long getCashBalance(String subject){
+    public long getCashBalance(Member member){
 
-        KrwAsset krwAsset = krwAssetRepository.findByMember(subject)
+        KrwAsset krwAsset = krwAssetRepository.findByMember(member)
                 .orElseThrow(() -> new IllegalStateException("값이 없으면 안되는 상태"));
 
         return krwAsset.getCashBalance();

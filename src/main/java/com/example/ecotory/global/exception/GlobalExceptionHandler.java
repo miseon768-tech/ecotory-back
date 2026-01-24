@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     }
 
     /*
-    memberRepository.findById(subject).orElseThrow(() -> new NoSuchElementException("멤버 없음"));
+    memberRepository.findById(member).orElseThrow(() -> new NoSuchElementException("멤버 없음"));
 
     tradingPairRepository.findById(addAssetRequest.getTradingPairId()).orElseThrow(() -> new NoSuchElementException("트레이딩 페어 없음"));
 
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     }
 
     /*
-        if (!post.getMemberId().equals(subject)) {
+        if (!post.getMemberId().equals(member)) {
         throw new IllegalStateException("글 수정 권한 없음"); //403
 
         default 0 -> 시뮬레이션 안 함

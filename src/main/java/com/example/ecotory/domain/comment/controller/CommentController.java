@@ -3,6 +3,8 @@ package com.example.ecotory.domain.comment.controller;
 import com.example.ecotory.domain.comment.dto.response.comment.*;
 import com.example.ecotory.domain.comment.entity.Comment;
 import com.example.ecotory.domain.comment.service.CommentService;
+import com.example.ecotory.domain.member.entity.Member;
+import com.example.ecotory.domain.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,14 +22,15 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
+    private final MemberRepository memberRepository;
 
     @Operation(summary = "댓글 작성", description = "특정 대상(글, 동영상 등)에 댓글을 작성합니다.")
     @PostMapping
-    public ResponseEntity<?> addComment(@RequestAttribute String subject,
+    public ResponseEntity<?> addComment(@RequestAttribute Member member,
                                         @RequestBody String content,
                                         @RequestParam String postId)  {
 
-        Comment comment = commentService.addComment(subject, content, postId);
+        Comment comment = commentService.addComment(member, content, postId);
 
         AddCommentResponse response = AddCommentResponse.builder()
                 .comment(comment)
@@ -42,10 +45,10 @@ public class CommentController {
     @Operation(summary = "댓글 수정", description = "특정 댓글을 수정합니다.")
     @PutMapping("/{commentId}")
     public ResponseEntity<?> updateComment(@PathVariable String commentId,
-                                           @RequestAttribute String subject,
+                                           @RequestAttribute Member member,
                                            @RequestBody String content)  {
 
-        Comment comment = commentService.updateComment(commentId, subject, content);
+        Comment comment = commentService.updateComment(commentId, member, content);
 
         UpdateCommentResponse response = UpdateCommentResponse.builder()
                 .comment(comment)
@@ -59,9 +62,9 @@ public class CommentController {
     @Operation(summary = "댓글 삭제", description = "특정 댓글을 삭제합니다.")
     @DeleteMapping({"/{commentId}"})
     public ResponseEntity<?> deleteComment(@PathVariable String commentId,
-                                           @RequestAttribute String subject)  {
+                                           @RequestAttribute Member member)  {
 
-        DeleteCommentResponse response = commentService.deleteComment(commentId, subject);
+        DeleteCommentResponse response = commentService.deleteComment(commentId, member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -70,20 +73,23 @@ public class CommentController {
 
     @Operation(summary = "댓글 목록 조회", description = "특정 글의 댓글 목록을 조회합니다.")
     @GetMapping("/{postId}")
-    public ResponseEntity<GetCommentsByPostResponse> getComments(@RequestAttribute String subject,
+    public ResponseEntity<GetCommentsByPostResponse> getComments(@RequestAttribute Member member,
                                                                  @PathVariable String postId)  {
 
-        GetCommentsByPostResponse response = commentService.getComments(subject, postId);
+        GetCommentsByPostResponse response = commentService.getComments(member, postId);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
     }
 
     @Operation(summary = "사용자 댓글 목록 조회", description = "특정 사용자가 작성한 댓글 목록을 조회합니다.")
-    @GetMapping("/{memberId}")
+    @GetMapping("/user/{memberId}")
     public ResponseEntity<?> getCommentsByMember(@PathVariable String memberId)  {
 
-        GetCommentsByMemberResponse response = commentService.getMyComments(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        GetCommentsByMemberResponse response = commentService.getMyComments(member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);

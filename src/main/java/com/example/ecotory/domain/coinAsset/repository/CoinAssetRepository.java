@@ -1,6 +1,7 @@
 package com.example.ecotory.domain.coinAsset.repository;
 
 import com.example.ecotory.domain.coinAsset.entity.CoinAsset;
+import com.example.ecotory.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,18 +10,18 @@ import java.util.Optional;
 
 @Repository
 public interface CoinAssetRepository extends JpaRepository<CoinAsset, String> {
-    List<CoinAsset> findByMemberIdAndTradingPairId(String subject, Long tradingPairId);
+    List<CoinAsset> findByMemberIdAndTradingPairId(Member member, Long tradingPairId);
 
-    List<CoinAsset> findByMemberIdAndMarket(String subject, String market);
+    List<CoinAsset> findByMemberIdAndMarket(Member member, String market);
 
-    List<CoinAsset> findByMemberIdAndTradingPairKoreanName(String subject, String koreanName);
+    List<CoinAsset> findByMemberIdAndTradingPairKoreanName(Member member, String koreanName);
 
-    List<CoinAsset> findByMemberIdAndTradingPairEnglishName(String subject, String englishName);
+    List<CoinAsset> findByMemberIdAndTradingPairEnglishName(Member member, String englishName);
 
-    Optional<CoinAsset> findByMemberId(String subject);
+    Optional<CoinAsset> findByMemberId(Member member);
 
-    List<CoinAsset> findAllByMemberId(String subject);
+    List<CoinAsset> findAllByMemberId(Member member);
 
-    Optional<CoinAsset> findByMemberIdAndTradingPair_Market(String memberId, String market);
+    Optional<CoinAsset> findByMemberIdAndTradingPair_Market(Member member, String market);
 
 }

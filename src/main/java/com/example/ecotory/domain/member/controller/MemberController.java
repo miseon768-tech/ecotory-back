@@ -20,9 +20,9 @@ public class MemberController {
 
     // 내 정보 조회
     @GetMapping("/me")
-    public ResponseEntity<MemberInfoResponse> memberInfo(@RequestAttribute String subject) {
+    public ResponseEntity<MemberInfoResponse> memberInfo(@RequestAttribute Member member) {
 
-        Member getMyInfo = memberService.memberInfo(subject);
+        Member getMyInfo = memberService.memberInfo(member);
 
         MemberInfoResponse response = MemberInfoResponse.builder()
                 .success(true)
@@ -37,11 +37,11 @@ public class MemberController {
 
     // 계정 정보 수정
     @PutMapping("/me")
-    public ResponseEntity<UpdateMemberResponse> updateMember(@RequestAttribute String subject,
+    public ResponseEntity<UpdateMemberResponse> updateMember(@RequestAttribute Member member,
                                                              @RequestBody String email,
                                                              @RequestBody String nickname) {
 
-        memberService.updateMember(subject, email, nickname);
+        memberService.updateMember(member, email, nickname);
 
         UpdateMemberResponse response = UpdateMemberResponse.builder()
                 .success(true)
@@ -52,12 +52,12 @@ public class MemberController {
 
     // 비밀번호 변경
     @PutMapping("/me/password")
-    public ResponseEntity<ChangePasswordResponse> changePassword(@RequestAttribute String subject,
+    public ResponseEntity<ChangePasswordResponse> changePassword(@RequestAttribute Member member,
                                                                  @RequestBody String oldPassword,
                                                                  @RequestBody String newPassword,
                                                                  @RequestBody String newPasswordConfirm) {
 
-        memberService.changePassword(subject, oldPassword, newPassword, newPasswordConfirm);
+        memberService.changePassword(member, oldPassword, newPassword, newPasswordConfirm);
 
         ChangePasswordResponse response = ChangePasswordResponse.builder()
                 .success(true)
@@ -68,10 +68,10 @@ public class MemberController {
 
     // 회원 탈퇴
     @DeleteMapping("/me")
-    public ResponseEntity<DeleteMemberResponse> deleteMember(@RequestAttribute String subject,
+    public ResponseEntity<DeleteMemberResponse> deleteMember(@RequestAttribute Member member,
                                                              @RequestBody String password) {
 
-        memberService.deleteMember(subject, password);
+        memberService.deleteMember(member, password);
 
         DeleteMemberResponse response = DeleteMemberResponse.builder()
                 .success(true)

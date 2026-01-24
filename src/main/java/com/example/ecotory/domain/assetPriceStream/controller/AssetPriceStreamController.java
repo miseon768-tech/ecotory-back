@@ -6,6 +6,7 @@ import com.example.ecotory.domain.assetPriceStream.response.CoinEvalAmountRespon
 import com.example.ecotory.domain.assetPriceStream.response.CoinProfitResponse;
 import com.example.ecotory.domain.assetPriceStream.response.PortfolioAssetResponse;
 import com.example.ecotory.domain.assetPriceStream.service.AssetPriceStreamService;
+import com.example.ecotory.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,10 +33,10 @@ public class AssetPriceStreamController {
 
     @Operation(summary = "코인별 평가손익 조회", description = "특정 코인의 평가손익을 조회합니다.")
     @GetMapping("/profit")
-    public ResponseEntity<CoinProfitResponse> coinProfit(@RequestAttribute String subject,
+    public ResponseEntity<CoinProfitResponse> coinProfit(@RequestAttribute Member member,
                                                              @RequestParam String market) {
 
-        double coinProfit = assetPriceStreamService.coinProfit(subject, market);
+        double coinProfit = assetPriceStreamService.coinProfit(member, market);
 
         CoinProfitResponse response = CoinProfitResponse.builder()
                 .success(true)
@@ -47,10 +48,10 @@ public class AssetPriceStreamController {
     }
 
     @Operation(summary = "총 평가손익 조회", description = "총 평가손익을 조회합니다.")
-    @GetMapping("/profit")
-    public ResponseEntity<TotalProfitResponse> getTotalProfit(@RequestAttribute String subject) {
+    @GetMapping("/profit/total")
+    public ResponseEntity<TotalProfitResponse> getTotalProfit(@RequestAttribute Member member) {
 
-        double getTotalProfit = assetPriceStreamService.getTotalProfit(subject);
+        double getTotalProfit = assetPriceStreamService.getTotalProfit(member);
 
         TotalProfitResponse response = TotalProfitResponse.builder()
                 .success(true)
@@ -63,10 +64,10 @@ public class AssetPriceStreamController {
 
     @Operation(summary = "코인별 평가금액 조회", description = "특정 코인의 평가금액을 조회합니다.")
     @GetMapping("/eval-amount")
-    public ResponseEntity<CoinEvalAmountResponse> coinEvalAmount(@RequestAttribute String subject,
+    public ResponseEntity<CoinEvalAmountResponse> coinEvalAmount(@RequestAttribute Member member,
                                                                  @RequestParam String market) {
 
-        double coinProfit = assetPriceStreamService.coinEvalAmount(subject, market);
+        double coinProfit = assetPriceStreamService.coinEvalAmount(member, market);
 
         CoinEvalAmountResponse response = CoinEvalAmountResponse.builder()
                 .success(true)
@@ -78,9 +79,9 @@ public class AssetPriceStreamController {
     }
     @Operation(summary = "총 평가 금액 조회", description = "총 평가 금액을 조회합니다.")
     @GetMapping("/total-eval-amount")
-    public ResponseEntity<TotalEvalAmountResponse> getTotalEvalAmount(@RequestAttribute String subject) {
+    public ResponseEntity<TotalEvalAmountResponse> getTotalEvalAmount(@RequestAttribute Member member) {
 
-        double getTotalEvalAmount = assetPriceStreamService.getTotalEvalAmount(subject);
+        double getTotalEvalAmount = assetPriceStreamService.getTotalEvalAmount(member);
 
         TotalEvalAmountResponse response = TotalEvalAmountResponse.builder()
                 .success(true)
@@ -93,9 +94,9 @@ public class AssetPriceStreamController {
 
     @Operation(summary = "총 자산 조회", description = "총 자산을 조회합니다.")
     @GetMapping("/total")
-    public ResponseEntity<TotalAssetsResponse> getTotalAssets(@RequestAttribute String subject) {
+    public ResponseEntity<TotalAssetsResponse> getTotalAssets(@RequestAttribute Member member) {
 
-        double getTotalAssets = assetPriceStreamService.getTotalAssets(subject);
+        double getTotalAssets = assetPriceStreamService.getTotalAssets(member);
 
         TotalAssetsResponse response = TotalAssetsResponse.builder()
                 .success(true)
@@ -108,9 +109,9 @@ public class AssetPriceStreamController {
 
     @Operation(summary = "총 수익률 조회", description = "총 수익률을 조회합니다.")
     @GetMapping("/profit-rate")
-    public ResponseEntity<TotalProfitRateResponse> getTotalProfitRate(@RequestAttribute String subject) {
+    public ResponseEntity<TotalProfitRateResponse> getTotalProfitRate(@RequestAttribute Member member) {
 
-        double getTotalProfitRate = assetPriceStreamService.getTotalProfitRate(subject);
+        double getTotalProfitRate = assetPriceStreamService.getTotalProfitRate(member);
 
         TotalProfitRateResponse response = TotalProfitRateResponse.builder()
                 .success(true)
@@ -123,9 +124,9 @@ public class AssetPriceStreamController {
     // 보유자산 포트폴리오(%)
     @Operation(summary = "보유자산 포트폴리오 조회", description = "보유자산 포트폴리오를 조회합니다.")
     @GetMapping("/portfolio")
-    public ResponseEntity<PortfolioAssetResponse> portfolioAsset(@RequestAttribute String subject) {
+    public ResponseEntity<PortfolioAssetResponse> portfolioAsset(@RequestAttribute Member member) {
 
-        List<PortfolioItem> portfolio = assetPriceStreamService.portfolioAsset(subject);
+        List<PortfolioItem> portfolio = assetPriceStreamService.portfolioAsset(member);
 
         PortfolioAssetResponse response = PortfolioAssetResponse.builder()
                 .success(true)
@@ -135,7 +136,3 @@ public class AssetPriceStreamController {
         return ResponseEntity.ok(response);
     }
 }
-
-
-
-

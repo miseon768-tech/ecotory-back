@@ -5,6 +5,7 @@ import com.example.ecotory.domain.post.dto.response.postLike.GetPostLikeCountRes
 import com.example.ecotory.domain.post.dto.response.postLike.LikePostResponse;
 import com.example.ecotory.domain.post.dto.response.postLike.UnLikePostResponse;
 import com.example.ecotory.domain.post.service.PostLikeService;
+import com.example.ecotory.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,9 +27,9 @@ public class PostLikeController {
     @Operation(summary = "글 좋아요", description = "특정 글에 좋아요를 누릅니다.")
     @PostMapping("/{postId}")
     public ResponseEntity<LikePostResponse> likePost(@PathVariable String postId,
-                                                     @RequestAttribute String subject) {
+                                                     @RequestAttribute Member member) {
 
-        LikePostResponse response = postLikeService.likePost(postId, subject);
+        LikePostResponse response = postLikeService.likePost(postId, member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -37,9 +38,9 @@ public class PostLikeController {
     @Operation(summary = "글 좋아요 취소", description = "특정 글에 대한 좋아요를 취소합니다.")
     @DeleteMapping("/{postId}")
     public ResponseEntity<UnLikePostResponse> unlikePost(@PathVariable String postId,
-                                                         @RequestAttribute String subject) {
+                                                         @RequestAttribute Member member) {
 
-        UnLikePostResponse response = postLikeService.unlikePost(postId, subject);
+        UnLikePostResponse response = postLikeService.unlikePost(postId, member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -48,9 +49,9 @@ public class PostLikeController {
 
     @Operation(summary = "내가 좋아요한 글 조회", description = "내가 좋아요한 글 목록을 조회합니다.")
     @GetMapping("/my")
-    public ResponseEntity<GetMyLikedPostsResponse> getMyLikedPosts(@RequestAttribute String subject) {
+    public ResponseEntity<GetMyLikedPostsResponse> getMyLikedPosts(@RequestAttribute Member member) {
 
-        GetMyLikedPostsResponse response = postLikeService.getMyLikedPosts(subject);
+        GetMyLikedPostsResponse response = postLikeService.getMyLikedPosts(member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);

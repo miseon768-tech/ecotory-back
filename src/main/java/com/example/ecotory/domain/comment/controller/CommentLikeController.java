@@ -3,6 +3,7 @@ package com.example.ecotory.domain.comment.controller;
 import com.example.ecotory.domain.comment.dto.response.commentLike.CommentLikeCancelResponse;
 import com.example.ecotory.domain.comment.dto.response.commentLike.CommentLikeResponse;
 import com.example.ecotory.domain.comment.service.CommentLikeService;
+import com.example.ecotory.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,9 +25,9 @@ public class CommentLikeController {
     @Operation(summary = "댓글 좋아요", description = "특정 댓글에 좋아요를 누릅니다.")
     @PostMapping("/{commentId}")
     public ResponseEntity<CommentLikeResponse> likeComment(@PathVariable String commentId,
-                                                           @RequestAttribute String subject) {
+                                                           @RequestAttribute Member member) {
 
-        CommentLikeResponse response = commentLikeService.createCommentLike(commentId, subject);
+        CommentLikeResponse response = commentLikeService.createCommentLike(commentId, member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);
@@ -35,9 +36,9 @@ public class CommentLikeController {
     @Operation(summary = "댓글 좋아요 취소", description = "특정 댓글에 대한 좋아요를 취소합니다.")
     @DeleteMapping("/{commentId}")
     public ResponseEntity<CommentLikeCancelResponse> unlikeComment(@PathVariable String commentId,
-                                                                   @RequestAttribute String subject) {
+                                                                   @RequestAttribute Member member) {
 
-        CommentLikeCancelResponse response = commentLikeService.deleteCommentLike(commentId, subject);
+        CommentLikeCancelResponse response = commentLikeService.deleteCommentLike(commentId, member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
                 .body(response);

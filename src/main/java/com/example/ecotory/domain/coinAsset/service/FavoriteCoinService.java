@@ -7,6 +7,7 @@ import com.example.ecotory.domain.coinAsset.dto.response.FavoriteCoin.GetFavorit
 import com.example.ecotory.domain.coinAsset.entity.FavoriteCoin;
 import com.example.ecotory.domain.coinAsset.repository.FavoriteCoinRepository;
 import com.example.ecotory.domain.member.repository.MemberRepository;
+import com.example.ecotory.domain.member.entity.Member;
 import com.example.ecotory.domain.tradingPair.entity.TradingPair;
 import com.example.ecotory.domain.tradingPair.repository.TradingPairRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -27,7 +28,7 @@ public class FavoriteCoinService {
     private final TradingPairRepository tradingPairRepository;
 
     // 관심 코인 등록
-    public AddFavoriteCoinResponse addFavoriteCoin(String subject, String coinInput) {
+    public AddFavoriteCoinResponse addFavoriteCoin(Member member, String coinInput) {
 
        
 
@@ -37,7 +38,7 @@ public class FavoriteCoinService {
 
 
         FavoriteCoin favoriteCoin = new FavoriteCoin();
-        favoriteCoin.setMemberId(subject);
+        favoriteCoin.setMemberId(member.getId());
         favoriteCoin.setTradingPairId(tradingPair.getId());
         favoriteCoinRepository.save(favoriteCoin);
 
@@ -48,11 +49,11 @@ public class FavoriteCoinService {
     }
 
     // 관심 코인 목록 전체 조회
-    public GetFavoriteCoinsResponse getFavoriteCoins(String subject) {
+    public GetFavoriteCoinsResponse getFavoriteCoins(Member member) {
 
        
 
-        List<FavoriteCoin> favoriteCoinList = favoriteCoinRepository.findFavoriteCoinByMemberId(subject);
+        List<FavoriteCoin> favoriteCoinList = favoriteCoinRepository.findFavoriteCoinByMemberId(member.getId());
 
         if (favoriteCoinList.isEmpty()) {
             throw new NoSuchElementException("관심 코인 없음");
@@ -66,12 +67,12 @@ public class FavoriteCoinService {
     }
 
     // 관심 코인 선택 삭제
-    public DeleteFavoriteCoinResponse deleteFavoriteCoin(String subject, List<Long> tradingPairIds) {
+    public DeleteFavoriteCoinResponse deleteFavoriteCoin(Member member, List<Long> tradingPairIds) {
 
        
 
         List<FavoriteCoin> favoriteCoinList = favoriteCoinRepository
-                .findByMemberIdAndTradingPairIdIn(subject, tradingPairIds);
+                .findByMemberIdAndTradingPairIdIn(member, tradingPairIds);
 
         if (favoriteCoinList.isEmpty()) {
             throw new NoSuchElementException("관심 코인 없음");
@@ -86,12 +87,12 @@ public class FavoriteCoinService {
     }
 
     // 관심 코인 전체 삭제
-    public DeleteAllFavoriteCoinResponse deleteAllFavoriteCoins(String subject) {
+    public DeleteAllFavoriteCoinResponse deleteAllFavoriteCoins(Member member) {
 
        
 
         List<FavoriteCoin> favoriteCoinList = favoriteCoinRepository
-                .findFavoriteCoinByMemberId(subject);
+                .findFavoriteCoinByMemberId(member.getId());
 
         if (favoriteCoinList.isEmpty()) {
             throw new NoSuchElementException("관심 코인 없음");
