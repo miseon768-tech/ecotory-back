@@ -2,60 +2,77 @@ package com.example.ecotory.global.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+
+import com.example.ecotory.domain.member.entity.Member;
+import com.example.ecotory.domain.member.repository.MemberRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
+
 
 @Component
+@RequiredArgsConstructor
 public class JWTVerifyFilter extends OncePerRequestFilter {
 
-    // 특정 요청에 대해서는 필터를 적용하지 않도록 설정
+    private final MemberRepository memberRepository;
+
+    // 특정 경로와 특정 메소드를 필터에서 제외할지 판단하는 역할
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        // 요청 URI와 메서드 확인
+    protected boolean shouldNotFilter(HttpServletRequest request){
         String uri = request.getRequestURI();
         String method = request.getMethod();
 
-        // "/api/member"로 시작하는 URI와 OPTIONS 메서드에 대해서는 필터를 적용하지 않음
-        if (uri.startsWith("/api/member") || method.equals("OPTIONS")) {
-            return true;
-        } else {
-            return false;
-        }
+        return  (uri.equals("/api/member/login"))
+                || method.equals("OPTIONS"); // 메소드 요청이 OPTIONS 라고 오면 필터를 거치지 않겠다.
     }
 
-    // 실제 필터링 로직
+    // 모든 요청에 대해 필터가 수행할 동작 ( 인증 토큰 확인(JWT), 요청 헤더 검증 )
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-
-        // 요청 헤더에서 토큰 추출
-        String token = request.getHeader("Authorization");
-        if (token == null) {
-            response.getWriter().println("{\"success\":false}");
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // 메소드 요청이 "OPTIONS"와 같다면 필터 인증 코드를 거치지 않고
+        // 인증필터에서는 그냥 넘기고 다른 필터가 있다면 그쪽으로 넘기고 없다면 컨트롤러로 넘긴다.
+        if("OPTIONS".equals(request.getMethod())){
+            filterChain.doFilter(request,response);
             return;
         }
 
-        // 토큰 검증
+        // 헤더 Authorization 값을 가져와서 authHeader에 대입
+        String authHeader = request.getHeader("Authorization");
+
+        // 만약 authHeader가 null이거나 Bearer 로 시작하지 않으면 401 에러 보냄
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new IllegalStateException("토큰이 없거나 형식이 틀립니다.");
+        }
+
+        // 앞에 있는"Bearer "를 제외한 나머지를 가져옴
+        String token = authHeader.substring(7);
+
+        // 토큰 발급자가 맞는지 비밀키가 맞는지 검증
         DecodedJWT jwt;
-        try {
-            jwt = JWT.require(Algorithm.HMAC256("master")).withIssuer("ecotory").build().verify(token);
-        } catch (Exception e) {
-            response.getWriter().println("{\"success\":false}");
-            return;
+        try{
+            jwt = JWT.require(Algorithm.HMAC256("ecotoryKey")).withIssuer("ecotory").build().verify(token);
+        } catch (JWTVerificationException exception){
+            throw new IllegalStateException("사용자 토큰이 일치하지 않습니다.");
         }
 
-        // 토큰에서 사용자 정보 추출하여 요청 속성에 설정
-        int subject = Integer.parseInt(jwt.getSubject());
-        request.setAttribute("currentAccountId", subject);
+        // 인증시에 사용했던 계정의 ID를 설정해서 보냄
+        String subject = jwt.getSubject();
 
-        filterChain.doFilter(request, response);
+        Member member = memberRepository.findById(subject).orElseThrow(() -> new NoSuchElementException("직원 정보가 없습니다."));
+
+        //request.setAttribute("memberId", subject);
+        request.setAttribute("member", member);
+
+
+        filterChain.doFilter(request,response);
     }
 }

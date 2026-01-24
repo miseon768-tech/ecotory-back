@@ -17,7 +17,6 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
-    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
 
     // 댓글 작성
