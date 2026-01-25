@@ -13,4 +13,12 @@ public class LoginResponse {
     boolean success;
     Member member;
     String token;
+
+    public static LoginResponse fromEntity(Member member, String token) {
+        return LoginResponse.builder()
+                .success(true)
+                .member(member)
+                .token(token)
+                .build();
+    }
 }

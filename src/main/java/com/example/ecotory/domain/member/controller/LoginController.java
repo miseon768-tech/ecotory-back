@@ -6,6 +6,7 @@ import com.example.ecotory.domain.member.service.LoginService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,9 @@ public class LoginController {
 
         LoginResponse response = loginService.login(loginRequest);
 
-        return ResponseEntity.ok(response); // 200 OK
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+
     }
 }
