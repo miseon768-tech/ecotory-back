@@ -11,4 +11,11 @@ import lombok.Setter;
 public class UpdateCommentResponse {
     private Comment comment;
     private boolean success;
+
+    public static UpdateCommentResponse fromEntity(Comment comment, boolean success) {
+        return UpdateCommentResponse.builder()
+                .comment(comment)
+                .success(success)
+                .build();
+    }
 }

@@ -11,4 +11,11 @@ import lombok.Setter;
 public class CommentLikeResponse {
     private CommentLike commentLike;
     private boolean success;
+
+    public static CommentLikeResponse fromEntity(CommentLike commentLike, boolean success) {
+        return CommentLikeResponse.builder()
+                .commentLike(commentLike)
+                .success(success)
+                .build();
+    }
 }

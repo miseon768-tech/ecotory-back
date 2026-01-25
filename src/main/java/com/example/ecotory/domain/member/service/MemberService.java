@@ -1,5 +1,7 @@
 package com.example.ecotory.domain.member.service;
 
+import com.example.ecotory.domain.member.dto.request.ChangePasswordRequest;
+import com.example.ecotory.domain.member.dto.request.UpdateMemberRequest;
 import com.example.ecotory.domain.member.entity.Member;
 import com.example.ecotory.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,33 +23,34 @@ public class MemberService {
     }
 
     // 계정 정보 수정
-    public void updateMember(Member member, String email, String nickname) {
+    public Member updateMember(Member member, UpdateMemberRequest request) {
 
         Member existingMember = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        existingMember.setEmail(email);
-        existingMember.setNickname(nickname);
+        existingMember.setEmail(request.getEmail());
+        existingMember.setNickname(request.getNickname());
 
-        memberRepository.save(existingMember);
+        return memberRepository.save(existingMember);
     }
 
     // 비밀번호 변경
-    public void changePassword(Member member, String oldPassword, String newPassword, String newPasswordConfirm) {
+    public Member changePassword(Member member, ChangePasswordRequest request) {
 
         Member existingMember = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        if (!passwordEncoder.matches(oldPassword, existingMember.getPassword())) {
+        if (!passwordEncoder.matches(request.getOldPassword(), existingMember.getPassword())) {
             throw new RuntimeException("현재 비밀번호가 일치하지 않습니다.");
         }
 
-        if (!newPassword.equals(newPasswordConfirm)) {
+        if (!request.getNewPassword().equals(request.getNewPasswordConfirm())) {
             throw new RuntimeException("새로운 비밀번호가 일치하지 않습니다.");
         }
 
-        existingMember.setPassword(passwordEncoder.encode(newPassword));
-        memberRepository.save(existingMember);
+        existingMember.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+       return memberRepository.save(existingMember);
     }
 
     // 회원 탈퇴
@@ -60,6 +63,6 @@ public class MemberService {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
-        memberRepository.delete(existingMember);
+       memberRepository.delete(existingMember);
     }
 }

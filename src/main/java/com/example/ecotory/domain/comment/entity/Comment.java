@@ -22,9 +22,7 @@ public class Comment {
     private String id;
 
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
+    private String postId;
 
     @ManyToOne
     @JoinColumn(name = "member_id")

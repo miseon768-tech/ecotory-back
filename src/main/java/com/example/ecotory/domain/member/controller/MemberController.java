@@ -1,5 +1,7 @@
 package com.example.ecotory.domain.member.controller;
 
+import com.example.ecotory.domain.member.dto.request.ChangePasswordRequest;
+import com.example.ecotory.domain.member.dto.request.UpdateMemberRequest;
 import com.example.ecotory.domain.member.dto.response.member.ChangePasswordResponse;
 import com.example.ecotory.domain.member.dto.response.member.DeleteMemberResponse;
 import com.example.ecotory.domain.member.dto.response.member.MemberInfoResponse;
@@ -8,6 +10,7 @@ import com.example.ecotory.domain.member.entity.Member;
 
 import com.example.ecotory.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,59 +27,44 @@ public class MemberController {
 
         Member getMyInfo = memberService.memberInfo(member);
 
-        MemberInfoResponse response = MemberInfoResponse.builder()
-                .success(true)
-                .id(getMyInfo.getId())
-                .email(getMyInfo.getEmail())
-                .nickname(getMyInfo.getNickname())
-                .createdAt(String.valueOf(getMyInfo.getCreatedAt()))
-                .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(MemberInfoResponse.fromEntity(getMyInfo));
     }
 
     // 계정 정보 수정
     @PutMapping("/me")
     public ResponseEntity<UpdateMemberResponse> updateMember(@RequestAttribute Member member,
-                                                             @RequestBody String email,
-                                                             @RequestBody String nickname) {
+                                                             @RequestBody UpdateMemberRequest request) {
 
-        memberService.updateMember(member, email, nickname);
+        Member updateMember = memberService.updateMember(member, request);
 
-        UpdateMemberResponse response = UpdateMemberResponse.builder()
-                .success(true)
-                .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(UpdateMemberResponse.fromEntity(updateMember));
     }
 
     // 비밀번호 변경
     @PutMapping("/me/password")
     public ResponseEntity<ChangePasswordResponse> changePassword(@RequestAttribute Member member,
-                                                                 @RequestBody String oldPassword,
-                                                                 @RequestBody String newPassword,
-                                                                 @RequestBody String newPasswordConfirm) {
+                                                                 @RequestBody ChangePasswordRequest request) {
 
-        memberService.changePassword(member, oldPassword, newPassword, newPasswordConfirm);
+        Member changePassword = memberService.changePassword(member, request);
 
-        ChangePasswordResponse response = ChangePasswordResponse.builder()
-                .success(true)
-                .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ChangePasswordResponse.fromEntity(changePassword));
     }
 
     // 회원 탈퇴
     @DeleteMapping("/me")
     public ResponseEntity<DeleteMemberResponse> deleteMember(@RequestAttribute Member member,
-                                                             @RequestBody String password) {
+                                             @RequestBody String password) {
 
         memberService.deleteMember(member, password);
 
-        DeleteMemberResponse response = DeleteMemberResponse.builder()
-                .success(true)
-                .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(DeleteMemberResponse.fromEntity());
     }
 }

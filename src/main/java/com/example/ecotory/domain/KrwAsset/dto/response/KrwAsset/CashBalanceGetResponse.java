@@ -10,4 +10,11 @@ import lombok.Setter;
 public class CashBalanceGetResponse {
     private long cashBalance;
     private boolean success;
+
+    public static CashBalanceGetResponse fromEntity(long cashBalance, boolean success) {
+        return CashBalanceGetResponse.builder()
+                .cashBalance(cashBalance)
+                .success(success)
+                .build();
+    }
 }

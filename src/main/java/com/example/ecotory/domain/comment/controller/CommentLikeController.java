@@ -2,6 +2,7 @@ package com.example.ecotory.domain.comment.controller;
 
 import com.example.ecotory.domain.comment.dto.response.commentLike.CommentLikeCancelResponse;
 import com.example.ecotory.domain.comment.dto.response.commentLike.CommentLikeResponse;
+import com.example.ecotory.domain.comment.entity.CommentLike;
 import com.example.ecotory.domain.comment.service.CommentLikeService;
 import com.example.ecotory.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,10 +28,11 @@ public class CommentLikeController {
     public ResponseEntity<CommentLikeResponse> likeComment(@PathVariable String commentId,
                                                            @RequestAttribute Member member) {
 
-        CommentLikeResponse response = commentLikeService.createCommentLike(commentId, member);
+        CommentLike commentLike = commentLikeService.createCommentLike(commentId, member);
 
-        return ResponseEntity.status(HttpStatus.OK) //200
-                .body(response);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommentLikeResponse.fromEntity(commentLike, true));
     }
 
     @Operation(summary = "댓글 좋아요 취소", description = "특정 댓글에 대한 좋아요를 취소합니다.")
@@ -38,11 +40,10 @@ public class CommentLikeController {
     public ResponseEntity<CommentLikeCancelResponse> unlikeComment(@PathVariable String commentId,
                                                                    @RequestAttribute Member member) {
 
-        CommentLikeCancelResponse response = commentLikeService.deleteCommentLike(commentId, member);
+        CommentLike commentLike = commentLikeService.deleteCommentLike(commentId, member);
 
-        return ResponseEntity.status(HttpStatus.OK) //200
-                .body(response);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommentLikeCancelResponse.fromEntity(commentLike, true));
     }
-
-
 }

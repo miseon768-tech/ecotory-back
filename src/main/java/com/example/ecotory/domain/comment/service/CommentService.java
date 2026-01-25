@@ -1,5 +1,6 @@
 package com.example.ecotory.domain.comment.service;
 
+import com.example.ecotory.domain.comment.dto.request.AddCommentRequest;
 import com.example.ecotory.domain.comment.dto.response.comment.*;
 import com.example.ecotory.domain.comment.entity.Comment;
 import com.example.ecotory.domain.comment.repository.CommentRepository;
@@ -20,16 +21,14 @@ public class CommentService {
     private final PostRepository postRepository;
 
     // 댓글 작성
-    public Comment addComment(Member member, String content, String postId) {
+    public Comment addComment(Member member, AddCommentRequest request) {
 
-        Post post = postRepository.findById(postId)
+        postRepository.findById(request.getPostId())
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
 
-        Comment comment = new Comment();
-        comment.setContent(content);
-        comment.setPost(post);
+        Comment addComment = request.toEntity();
 
-        return commentRepository.save(comment);
+        return commentRepository.save(addComment);
 
     }
 
@@ -39,6 +38,10 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NoSuchElementException("댓글 없음"));
 
+        if (!comment.getMember().getId().equals(member.getId())) {
+            throw new IllegalStateException("본인이 작성한 댓글만 삭제할 수 있습니다.");
+        }
+
         comment.setContent(content);
 
         return commentRepository.save(comment);
@@ -46,44 +49,34 @@ public class CommentService {
     }
 
     // 댓글 삭제
-    public DeleteCommentResponse deleteComment(String commentId, Member member) {
+    public Comment deleteComment(String commentId, Member member) {
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NoSuchElementException("댓글 없음"));
 
+        if (!comment.getMember().getId().equals(member.getId())) {
+            throw new IllegalStateException("본인이 작성한 댓글만 삭제할 수 있습니다.");
+        }
 
         commentRepository.delete(comment);
 
-        return DeleteCommentResponse.builder()
-                .success(true)
-                .build();
+        return comment;
     }
 
     // 댓글 목록 조회(특정 글의 댓글들)
-    public GetCommentsByPostResponse getComments(Member member, String postId) {
+    public List<Comment> getComments(String postId) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
 
 
-        List<Comment> commentList = commentRepository.findByPost(post);
-
-
-        return GetCommentsByPostResponse.builder()
-                .commentList(commentList)
-                .success(true)
-                .build();
+        return commentRepository.findByPost(post);
     }
 
     // 댓글 목록 조회(사용자의 댓글들)
-    public GetCommentsByMemberResponse getMyComments(Member member) {
+    public List<Comment> getMyComments(Member member) {
 
-        List<Comment> commentListByMember = commentRepository.findByMember(member);
-
-        return GetCommentsByMemberResponse.builder()
-                .commentListByMember(commentListByMember)
-                .success(true)
-                .build();
+        return commentRepository.findByMember(member);
     }
 
 }

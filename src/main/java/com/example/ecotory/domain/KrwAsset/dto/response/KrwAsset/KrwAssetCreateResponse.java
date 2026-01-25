@@ -11,4 +11,11 @@ import lombok.Setter;
 public class KrwAssetCreateResponse {
     private KrwAsset KrwAsset;
     private boolean success;
+
+    public static KrwAssetCreateResponse fromEntity(KrwAsset krwAsset, boolean success) {
+        return KrwAssetCreateResponse.builder()
+                .KrwAsset(krwAsset)
+                .success(success)
+                .build();
+    }
 }

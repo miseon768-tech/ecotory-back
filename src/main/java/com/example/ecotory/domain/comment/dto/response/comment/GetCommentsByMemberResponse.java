@@ -13,4 +13,11 @@ import java.util.List;
 public class GetCommentsByMemberResponse {
     private List<Comment> commentListByMember;
     private boolean success;
+
+    public static GetCommentsByMemberResponse fromEntity(List<Comment> commentListByMember, boolean success) {
+        return GetCommentsByMemberResponse.builder()
+                .commentListByMember(commentListByMember)
+                .success(success)
+                .build();
+    }
 }

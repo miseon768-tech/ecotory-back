@@ -5,8 +5,6 @@ import com.example.ecotory.domain.KrwAsset.dto.request.UpdateAssetRequest;
 import com.example.ecotory.domain.KrwAsset.dto.response.KrwAsset.*;
 import com.example.ecotory.domain.KrwAsset.entity.KrwAsset;
 import com.example.ecotory.domain.KrwAsset.repository.KrwAssetRepository;
-import com.example.ecotory.domain.coinAsset.repository.CoinAssetRepository;
-import com.example.ecotory.domain.member.repository.MemberRepository;
 import com.example.ecotory.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,84 +15,55 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 public class KrwAssetService {
+
     private final KrwAssetRepository krwAssetRepository;
-    private final MemberRepository memberRepository;
-    private final CoinAssetRepository coinAssetRepository;
 
     // 자산 추가
-    public KrwAssetCreateResponse addAsset(Member member, AddAssetRequest addAssetRequest) {
+    public KrwAsset addAsset(AddAssetRequest request) {
 
-       
+        KrwAsset krwAsset = request.toEntity();
 
-        KrwAsset krwAsset = new KrwAsset();
-        krwAsset.setCashBalance(addAssetRequest.getCashBalance());
-        krwAsset.setTotalByAmount(addAssetRequest.getTotalByAmount());
+        krwAssetRepository.save(krwAsset);
 
-        KrwAsset saved = krwAssetRepository.save(krwAsset);
-
-        return KrwAssetCreateResponse.builder()
-                .KrwAsset(saved)
-                .success(true)
-                .build();
+        return krwAsset;
     }
 
     // 자산 수정
-    public AssetUpdateResponse updateAsset(String KrwAssetId, Member member, UpdateAssetRequest updateAssetRequest) {
+    public KrwAsset updateAsset(String KrwAssetId, Member member, UpdateAssetRequest request) {
 
-       
-
-        KrwAsset KrwAsset = krwAssetRepository.findById(KrwAssetId)
+        KrwAsset krwAsset = krwAssetRepository.findById(KrwAssetId)
                 .orElseThrow(() -> new NoSuchElementException("자산 없음"));
 
-        if (!KrwAsset.getMemberId().equals(member)) {
+        if (!krwAsset.getMemberId().equals(member.getId())) {
             throw new IllegalStateException("자산 수정 권한 없음");
         }
 
+        krwAsset.setCashBalance(request.getCashBalance());
+        krwAsset.setTotalByAmount(request.getTotalByAmount());
 
-        KrwAsset krwAsset = new KrwAsset();
-        krwAsset.setCashBalance(updateAssetRequest.getCashBalance());
-        krwAsset.setTotalByAmount(updateAssetRequest.getTotalByAmount());
 
-        KrwAsset saved = krwAssetRepository.save(krwAsset);
-
-        return AssetUpdateResponse.builder()
-                .KrwAsset(saved)
-                .success(true)
-                .build();
+        return krwAssetRepository.save(krwAsset);
     }
 
     // 자산 삭제
-    public AssetDeleteResponse deleteAsset(String KRWAssetId, Member member) {
+    public KrwAsset deleteAsset(String KRWAssetId, Member member) {
 
-       
-
-        KrwAsset KRWAsset = krwAssetRepository.findById(KRWAssetId)
+        KrwAsset krwAsset = krwAssetRepository.findById(KRWAssetId)
                 .orElseThrow(() -> new NoSuchElementException("자산 없음"));
 
-        if (!KRWAsset.getMemberId().equals(member)) {
+        if (!krwAsset.getMemberId().equals(member.getId())) {
             throw new IllegalStateException("자산 삭제 권한 없음");
         }
 
-        krwAssetRepository.delete(KRWAsset);
+        krwAssetRepository.delete(krwAsset);
 
-        return AssetDeleteResponse.builder()
-                .success(true)
-                .build();
+        return krwAsset;
     }
 
     // 특정 멤버 자산 조회
-    public KrwAssetByMemberResponse KRWAssetByMember(Member member) {
+    public List<KrwAsset> KrwAssetByMember(Member member) {
 
-       
-
-
-        List<KrwAsset> krwAssetList = krwAssetRepository.findByMemberId(member);
-
-
-        return KrwAssetByMemberResponse.builder()
-                .KrwAssetList(krwAssetList)
-                .success(true)
-                .build();
+        return krwAssetRepository.findByMemberId(member);
     }
 
     // 주문 가능 금액(=보유 KRW) 입력 및 수정 : 사용자가 직접 입력, 추가 금액 기재시 더함? 더할 필요가 있나 그냥 수정을 하면 될듯

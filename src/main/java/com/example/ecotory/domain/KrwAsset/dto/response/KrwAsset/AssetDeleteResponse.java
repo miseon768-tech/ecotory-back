@@ -10,4 +10,10 @@ import lombok.Setter;
 public class AssetDeleteResponse {
 
     private boolean success;
+
+    public static AssetDeleteResponse fromEntity(boolean success) {
+        return AssetDeleteResponse.builder()
+                .success(success)
+                .build();
+    }
 }

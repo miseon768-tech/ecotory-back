@@ -13,4 +13,11 @@ import java.util.List;
 public class KrwAssetByMemberResponse {
     private List<KrwAsset> KrwAssetList;
     private boolean success;
+
+    public static KrwAssetByMemberResponse fromEntity(List<KrwAsset> krwAssetList, boolean success) {
+        return KrwAssetByMemberResponse.builder()
+                .KrwAssetList(krwAssetList)
+                .success(success)
+                .build();
+    }
 }
