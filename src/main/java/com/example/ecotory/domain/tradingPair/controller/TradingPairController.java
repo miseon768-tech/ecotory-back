@@ -5,6 +5,7 @@ import com.example.ecotory.domain.tradingPair.entity.TradingPair;
 import com.example.ecotory.domain.tradingPair.service.TradingPairService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,11 +24,8 @@ public class TradingPairController {
 
         List<TradingPair> tradingPairs = tradingPairService.getMarkets();
 
-        TradingPairResponse response = TradingPairResponse.builder()
-                .tradingPairs(tradingPairs)
-                .success(true)
-                .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity
+                .status(HttpStatus.OK) //200
+                .body(TradingPairResponse.fromEntity(tradingPairs));
     }
 }

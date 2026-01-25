@@ -17,4 +17,11 @@ TradingPairResponse { // 페어 목록(전체 목록) 조회
 
     private List<TradingPair> tradingPairs;
     private boolean success;
+
+    public static TradingPairResponse fromEntity(List<TradingPair> tradingPairs) {
+        return TradingPairResponse.builder()
+                .tradingPairs(tradingPairs)
+                .success(true)
+                .build();
+    }
 }
