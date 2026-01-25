@@ -1,5 +1,6 @@
 package com.example.ecotory.domain.post.dto.response.postDraft;
 
+import com.example.ecotory.domain.post.entity.PostDraft;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,4 +16,12 @@ public class SaveDraftResponse {
     private String status;         // 임시 상태, 항상 "DRAFT"로 전달
 
 
+    public static SaveDraftResponse fromEntity(PostDraft response) {
+        return SaveDraftResponse.builder()
+                .id(response.getId())
+                .title(response.getTitle())
+                .savedAt(response.getUpdatedAt())
+                .status("DRAFT")
+                .build();
+    }
 }

@@ -1,6 +1,5 @@
 package com.example.ecotory.domain.member.emailCode;
 
-import com.example.ecotory.domain.member.emailCode.dto.EmailCodeResponse;
 import com.example.ecotory.domain.member.entity.Member;
 import com.example.ecotory.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,17 +17,11 @@ public class EmailCodeService {
     private final EmailCodeRepository emailCodeRepository;
 
     // 이메일 인증 코드 발송
-    public EmailCodeResponse sendEmailCode(String email) {
+    public EmailCode sendEmailCode(String email) {
 
         // 1. 사용자 조회
-        Member member = memberRepository.findByEmail(email).orElse(null);
-
-        if (member == null) {
-            return EmailCodeResponse.builder()
-                    .success(false)
-                    .message("가입된 사용자가 아닙니다.")
-                    .build();
-        }
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalStateException("가입된 사용자가 아닙니다."));
 
         // 2. 인증코드 생성
         String code = String.format("%06d", (int) (Math.random() * 1000000));
@@ -51,11 +44,7 @@ public class EmailCodeService {
         emailCode.setMemberId(member.getId());
         emailCode.setExpiredAt(LocalDateTime.now().plusMinutes(10));
 
-        emailCodeRepository.save(emailCode);
 
-        return EmailCodeResponse.builder()
-                .success(true)
-                .message("인증 코드가 이메일로 전송되었습니다.")
-                .build();
+        return emailCodeRepository.save(emailCode);
     }
 }

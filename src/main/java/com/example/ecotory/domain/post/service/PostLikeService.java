@@ -1,10 +1,5 @@
 package com.example.ecotory.domain.post.service;
 
-import com.example.ecotory.domain.member.repository.MemberRepository;
-import com.example.ecotory.domain.post.dto.response.postLike.GetMyLikedPostsResponse;
-import com.example.ecotory.domain.post.dto.response.postLike.GetPostLikeCountResponse;
-import com.example.ecotory.domain.post.dto.response.postLike.LikePostResponse;
-import com.example.ecotory.domain.post.dto.response.postLike.UnLikePostResponse;
 import com.example.ecotory.domain.post.entity.PostLike;
 import com.example.ecotory.domain.post.repository.PostLikeRepository;
 import com.example.ecotory.domain.post.repository.PostRepository;
@@ -15,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -23,14 +17,11 @@ import java.util.stream.Collectors;
 
 public class PostLikeService {
 
-    private final MemberRepository memberRepository;
     private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
 
     // 좋아요 누르기
-    public LikePostResponse likePost(String postId, Member member) {
-
-       
+    public PostLike likePost(String postId, Member member) {
 
         postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
@@ -46,16 +37,12 @@ public class PostLikeService {
                 .memberId(member.getId())
                 .build();
 
-        PostLike savedLike = postLikeRepository.save(newLike);
 
-        return LikePostResponse.builder()
-                .postLike(savedLike)
-                .success(true)
-                .build();
+        return postLikeRepository.save(newLike);
     }
 
     // 좋아요 취소
-    public UnLikePostResponse unlikePost(String postId, Member member) {
+    public PostLike unlikePost(String postId, Member member) {
 
        
 
@@ -67,40 +54,27 @@ public class PostLikeService {
 
         postLikeRepository.delete(postLike);
 
-        return UnLikePostResponse.builder()
-                .postLike(null)
-                .success(true)
-                .build();
+        return postLike;
+
     }
 
     // 내가 좋아요한 글 조회
-    public GetMyLikedPostsResponse getMyLikedPosts(Member member) {
+    public List<String> getMyLikedPosts(Member member) {
 
-       
-
-        List<PostLike> likedPosts = postLikeRepository.findByMember(member);
-
-        List<String> postList = likedPosts.stream()
+        List<String> postList = postLikeRepository.findByMember(member)
+                .stream()
                 .map(PostLike::getPostId)
-                .collect(Collectors.toList());
+                .toList();
 
-        return GetMyLikedPostsResponse.builder()
-                .postList(postList)
-                .success(true)
-                .build();
+        return postList;
     }
 
     // 글 좋아요 수 조회
-    public GetPostLikeCountResponse getPostLikeCount(String postId) {
+    public Long getPostLikeCount(String postId) {
 
         postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
 
-        Long likeCount = postLikeRepository.countByPost(postId);
-
-        return GetPostLikeCountResponse.builder()
-                .likeCount(likeCount)
-                .success(true)
-                .build();
+        return postLikeRepository.countByPost(postId);
     }
 }

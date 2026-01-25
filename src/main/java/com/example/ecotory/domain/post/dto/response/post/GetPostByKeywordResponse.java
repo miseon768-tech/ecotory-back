@@ -13,4 +13,11 @@ import java.util.List;
 public class GetPostByKeywordResponse {
     private List<Post> postList;
     private boolean success;
+
+    public static GetPostByKeywordResponse fromEntity(List<Post> response) {
+        return GetPostByKeywordResponse.builder()
+                .postList(response)
+                .success(true)
+                .build();
+    }
 }

@@ -11,4 +11,11 @@ import lombok.Setter;
 public class AddPostResponse {
     private Post post;
     private boolean success;
+
+    public static AddPostResponse fromEntity(Post post) {
+        return AddPostResponse.builder()
+                .post(post)
+                .success(true)
+                .build();
+    }
 }

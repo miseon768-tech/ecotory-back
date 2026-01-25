@@ -13,4 +13,11 @@ import java.util.List;
 public class GetAllPostResponse {
     private List<Post> postList;
     private boolean success;
+
+    public static GetAllPostResponse fromEntity(List<Post> postList) {
+        return GetAllPostResponse.builder()
+                .postList(postList)
+                .success(true)
+                .build();
+    }
 }

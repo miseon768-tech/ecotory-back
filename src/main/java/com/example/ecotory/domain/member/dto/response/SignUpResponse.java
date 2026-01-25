@@ -11,4 +11,11 @@ import lombok.Setter;
 public class SignUpResponse {
     boolean success;
     Member member;
+
+    public static SignUpResponse fromEntity(Member member) {
+        return SignUpResponse.builder()
+                .member(member)
+                .success(true)
+                .build();
+    }
 }

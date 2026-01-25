@@ -4,6 +4,7 @@ import com.example.ecotory.domain.post.dto.response.postLike.GetMyLikedPostsResp
 import com.example.ecotory.domain.post.dto.response.postLike.GetPostLikeCountResponse;
 import com.example.ecotory.domain.post.dto.response.postLike.LikePostResponse;
 import com.example.ecotory.domain.post.dto.response.postLike.UnLikePostResponse;
+import com.example.ecotory.domain.post.entity.PostLike;
 import com.example.ecotory.domain.post.service.PostLikeService;
 import com.example.ecotory.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "PostLike", description = "글 좋아요 관련 API")
@@ -29,10 +32,11 @@ public class PostLikeController {
     public ResponseEntity<LikePostResponse> likePost(@PathVariable String postId,
                                                      @RequestAttribute Member member) {
 
-        LikePostResponse response = postLikeService.likePost(postId, member);
+         PostLike response = postLikeService.likePost(postId, member);
 
-        return ResponseEntity.status(HttpStatus.OK) //200
-                .body(response);
+        return ResponseEntity
+                .status(HttpStatus.OK) //200
+                .body(LikePostResponse.fromEntity(response));
     }
 
     @Operation(summary = "글 좋아요 취소", description = "특정 글에 대한 좋아요를 취소합니다.")
@@ -40,10 +44,10 @@ public class PostLikeController {
     public ResponseEntity<UnLikePostResponse> unlikePost(@PathVariable String postId,
                                                          @RequestAttribute Member member) {
 
-        UnLikePostResponse response = postLikeService.unlikePost(postId, member);
+        PostLike response = postLikeService.unlikePost(postId, member);
 
         return ResponseEntity.status(HttpStatus.OK) //200
-                .body(response);
+                .body(UnLikePostResponse.fromEntity(response));
     }
 
 
@@ -51,10 +55,11 @@ public class PostLikeController {
     @GetMapping("/my")
     public ResponseEntity<GetMyLikedPostsResponse> getMyLikedPosts(@RequestAttribute Member member) {
 
-        GetMyLikedPostsResponse response = postLikeService.getMyLikedPosts(member);
+        List<String> response = postLikeService.getMyLikedPosts(member);
 
-        return ResponseEntity.status(HttpStatus.OK) //200
-                .body(response);
+        return ResponseEntity
+                .status(HttpStatus.OK) //200
+                .body(GetMyLikedPostsResponse.fromEntity(response));
     }
 
 
@@ -62,9 +67,9 @@ public class PostLikeController {
     @GetMapping("/count/{postId}")
     public ResponseEntity<GetPostLikeCountResponse> getPostLikeCount(@PathVariable String postId) {
 
-        GetPostLikeCountResponse response = postLikeService.getPostLikeCount(postId);
+        Long response = postLikeService.getPostLikeCount(postId);
 
         return ResponseEntity.status(HttpStatus.OK) //200
-                .body(response);
+                .body(GetPostLikeCountResponse.fromEntity(response));
     }
 }

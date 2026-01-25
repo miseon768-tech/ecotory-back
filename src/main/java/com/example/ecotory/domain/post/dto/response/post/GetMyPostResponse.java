@@ -13,4 +13,11 @@ import java.util.List;
 public class GetMyPostResponse {
     private List<Post> postList;
     private boolean success;
+
+    public static GetMyPostResponse fromEntity(List<Post> response) {
+        return GetMyPostResponse.builder()
+                .postList(response)
+                .success(true)
+                .build();
+    }
 }

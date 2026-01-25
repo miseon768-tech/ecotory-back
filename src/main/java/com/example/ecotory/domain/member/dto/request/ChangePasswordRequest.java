@@ -11,7 +11,7 @@ public class ChangePasswordRequest {
     private String newPasswordConfirm;
     private boolean success;
 
-    public static ChangePasswordRequest fromEntity(String oldPassword, String newPassword, String newPasswordConfirm) {
+    public ChangePasswordRequest fromEntity(String oldPassword, String newPassword, String newPasswordConfirm) {
         return ChangePasswordRequest.builder()
                 .oldPassword(oldPassword)
                 .newPassword(newPassword)

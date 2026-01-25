@@ -11,4 +11,11 @@ import lombok.Setter;
 public class LikePostResponse {
     private PostLike postLike;
     private boolean success;
+
+    public static LikePostResponse fromEntity(PostLike response) {
+        return LikePostResponse.builder()
+                .postLike(response)
+                .success(true)
+                .build();
+    }
 }
